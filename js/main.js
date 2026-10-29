@@ -1,4 +1,3 @@
-// ===== data (levels validated below; audio paths are slots, files must be supplied) =====
 const W=[{n:'مراحل الحروف (28)',c:0x7ec850,sky:0x9be0ff,req:0},{n:'مراحل الكلمات (28)',c:0xf2c26b,sky:0xffe2b0,req:0}];
 const LV0=[{id:'l1',w:0,n:'أَ أُ إِ',s:[['أَ','أُ','إِ']]},{id:'l2',w:0,n:'بَ بُ بِ',s:[['بَ','بُ','بِ']]},{id:'l3',w:0,n:'تَ تُ تِ',s:[['تَ','تُ','تِ'],['بَ','بُ','بِ']]},{id:'l4',w:1,n:'مَا مُو مِي',s:[['مَا','مُو','مِي']]},{id:'l5',w:1,n:'سَا سُو سِي',s:[['سَا','سُو','سِي'],['مَا','مُو','مِي']]}];
 const LET=[...'أبتثجحخدذرزسشصضطظعغفقكلمنهوي'];
@@ -266,5 +265,4 @@ function buildCarGroup(idx,color){const _wh=wheels;
  const c=CARS[idx]||CARS[0],g=new THREE.Group(),W=c.w,L=c.l,bt=.3+((c.y||.5)-.5),h=c.h*.75+.3,cb=c.cb*.7,rr=c.wr||.42,
  T={pick:[[[.5,0],[.5,.5],[.45,.68],[.3,.8],[.2,.86],[.02,.86],[0,.7],[-.5,.7],[-.5,0]],[.22,.12,.02,.02]],jeep:[[[.5,0],[.5,.55],[.46,.8],[.2,.86],[-.5,.86],[-.5,0]],[.2,.15,-.32,-.34]],f1:[[[.5,0],[.5,.35],[.2,.6],[-.2,.8],[-.5,.8],[-.5,0]],[0,-.05,-.12,-.15]],van:[[[.5,0],[.5,.5],[.44,.74],[.3,.86],[-.5,.86],[-.5,0]],[.3,.26,-.45,-.46]]},
  t=T[c.k]||[[[.5,0],[.5,.5],[.45,.68],[.28,.8],[.14,.86],[-.3,.86],[-.43,.8],[-.5,.58],[-.5,0]],[.15,.05,-.2,-.3]],
- body=new THREE.MeshPhysicalMaterial({color:color,metalness:.25,roughness:.3,clearcoat:1,clearcoatRoughness:.08}),gl=new THREE.MeshStandardMaterial({color:0x223344,metalness:.6,roughness:.1}),dk=new THREE.MeshStandardMaterial({color:0x111827,roughnes
-                                                                                                                                                                                                                                 
+ body=new THREE.MeshPhysicalMaterial({color:color,metalness:.25,roughness:.3,clearcoat:1,clearcoatRoughness:.08}),gl=new THREE.MeshStandardMaterial({color:0x223344,metalness:.6,roughness:.1}),dk=new THREE.MeshStandardMaterial({color:0x111827,roughness:.7}),ch=new THREE.MeshStandardMaterial({color:0xe5e7eb,metalness:.9,roughness:.2}),hl=new 
