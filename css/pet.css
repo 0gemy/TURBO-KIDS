@@ -1,0 +1,9 @@
+.pet-home{display:flex;align-items:center;justify-content:center;gap:10px;margin:2px auto;cursor:pointer;min-height:96px}
+.pet-bub{background:#fff;color:#102744;border-radius:18px;padding:7px 12px;font:800 14px Cairo;max-width:190px;box-shadow:0 4px 0 #94a3b8}
+.pet-svg{width:84px;height:92px;flex:none;animation:pbr 3s ease-in-out infinite}.pet-big .pet-svg{width:150px;height:164px}
+@keyframes pbr{50%{transform:scale(1.04) translateY(-2px)}}
+.pet-hop .pet-svg{animation:phop .6s}@keyframes phop{30%{transform:translateY(-16px) scale(1.06)}60%{transform:translateY(0) scale(.97)}}
+.pet-bar{height:14px;border-radius:9px;background:#e2e8f0;overflow:hidden}.pet-bar i{display:block;height:100%;background:linear-gradient(90deg,#4ade80,#16a34a);transition:width .4s}
+.pet-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.pet-row .btn{flex:1 1 40%;min-width:0}
+.pet-acc.on{outline:3px solid #22c55e}
+@media(prefers-reduced-motion:reduce){.pet-svg,.pet-hop .pet-svg{animation:none}}

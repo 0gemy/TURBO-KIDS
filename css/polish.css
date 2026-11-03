@@ -1,0 +1,6 @@
+.scr.on{animation:scrIn .22s ease-out}@keyframes scrIn{from{opacity:0}}
+:focus-visible{outline:3px solid #fde68a;outline-offset:2px}
+#petRace{position:fixed;left:8px;bottom:calc(env(safe-area-inset-bottom) + 92px);width:46px;pointer-events:none;z-index:4}#petRace .pet-svg{width:46px;height:50px;animation:none}
+#offB{display:none;position:fixed;top:calc(env(safe-area-inset-top) + 6px);left:50%;transform:translateX(-50%);z-index:95;background:#0c2748;color:#fde68a;border:2px solid #fde68a;border-radius:999px;padding:4px 14px;font:800 13px Cairo;pointer-events:none;white-space:nowrap}
+.dm-chip{margin:4px auto;padding:6px 14px;border-radius:999px;background:#0c2748cc;border:2px solid #7dd3fc;color:#fff;font:800 14px Cairo;text-align:center;cursor:pointer;width:fit-content}.dm-chip.rdy{background:linear-gradient(#fb923c,#ea580c);border-color:#fff;animation:pbr 1.2s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
