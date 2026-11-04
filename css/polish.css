@@ -1,0 +1,20 @@
+.scr.on{animation:scrIn .22s ease-out}@keyframes scrIn{from{opacity:0}}
+:focus-visible{outline:3px solid #fde68a;outline-offset:2px}
+#petRace{position:fixed;left:8px;bottom:calc(env(safe-area-inset-bottom) + 92px);width:46px;pointer-events:none;z-index:4}#petRace .pet-svg{width:46px;height:50px;animation:none}
+#offB{display:none;position:fixed;top:calc(env(safe-area-inset-top) + 6px);left:50%;transform:translateX(-50%);z-index:95;background:#0c2748;color:#fde68a;border:2px solid #fde68a;border-radius:999px;padding:4px 14px;font:800 13px Cairo;pointer-events:none;white-space:nowrap}
+.dm-chip{margin:4px auto;padding:6px 14px;border-radius:999px;background:#0c2748cc;border:2px solid #7dd3fc;color:#fff;font:800 14px Cairo;text-align:center;cursor:pointer;width:fit-content}.dm-chip.rdy{background:linear-gradient(#fb923c,#ea580c);border-color:#fff;animation:pbr 1.2s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+/* ===== account screens ===== */
+.acc-choice{display:flex;flex-direction:column;gap:10px}.acc-pet{display:flex;justify-content:center}.acc-pet .pet-svg{width:84px;height:92px}
+.acc-f{display:block;text-align:right}.acc-f>span{display:block;font:800 14px Cairo;margin-bottom:4px}
+.acc-i{position:relative}.acc-i input{padding-inline-end:48px}
+.acc-eye{position:absolute;inset-inline-end:4px;top:50%;transform:translateY(-50%);border:0;background:none;font-size:22px;min-width:42px;min-height:42px}
+.acc-f.bad input{border-color:#dc2626;background:#fef2f2}.acc-h{display:block;color:#64748b;font:700 12px Cairo;margin-top:4px}
+.acc-e{display:block;color:#b91c1c;font:800 13px Cairo;margin-top:4px;line-height:1.5}.acc-e:empty{display:none}
+.acc-g{border-radius:14px;padding:10px 12px;font:700 14px Cairo;text-align:right;line-height:1.7}
+.acc-g.err{background:#fef2f2;border:2px solid #fca5a5;color:#991b1b}.acc-g.ok{background:#f0fdf4;border:2px solid #86efac;color:#166534}
+.acc-g .btn{margin-top:8px;width:100%}
+.acc-back{align-self:flex-start;border:0;background:none;color:#0369a1;font:800 15px Cairo;padding:6px 2px}
+.acc-sw{font:700 14px Cairo;color:#475569}.acc-sw button{border:0;background:none;color:#0369a1;font:800 14px Cairo;text-decoration:underline;padding:6px 4px}
+.acc-chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:6px}.acc-chips button{border:2px solid #38bdf8;background:#e0f2fe;color:#0c2748;border-radius:999px;padding:5px 12px;font:800 14px Poppins,Cairo}
+.btn[disabled]{opacity:.6}

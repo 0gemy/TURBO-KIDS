@@ -1,0 +1,20 @@
+/* confirm dialog */
+.cf-pv{display:flex;justify-content:center;align-items:center;font-size:60px;min-height:80px}.cf-pv .pet-svg{width:90px;height:99px;animation:none}.cf-pv .bx-i,.cf-pv .lb-pv{font-size:56px}
+.cf-q{font:800 17px Cairo;line-height:1.7;margin:2px 0}.cf-bal{display:flex;gap:8px}.cf-bal span{flex:1;background:#f1f5f9;border-radius:14px;padding:8px;font:700 12px Cairo;color:#475569}.cf-bal b{display:block;font:800 18px Cairo;color:#0c2748}.cf-bal b.neg{color:#b91c1c}
+/* lobby themes */
+.lb-grid,.bx-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.lb-card,.bx-card{border:3px solid #cbd5e1;border-radius:16px;background:#fff;padding:6px;display:flex;flex-direction:column;align-items:center;gap:4px;color:#0c2748}.lb-card.on{border-color:#22c55e}
+.lb-pv{width:100%;height:78px;border-radius:12px;border:2px solid #fff;box-shadow:0 2px 6px #0003}.lb-pv.big{width:160px;height:100px}.lb-card b,.bx-card b{font:800 14px Cairo}.lb-card .btn,.bx-card .btn{width:100%;min-height:40px;font-size:14px;padding:4px}
+/* wheel */
+.wh{position:relative;width:min(72vw,280px);margin:4px auto}.wh svg{width:100%;display:block}.wh-p{position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-size:30px;color:#dc2626;z-index:2;text-shadow:0 2px 0 #fff}
+/* boxes */
+.bx-i{font-size:46px;line-height:1.1}.bx-i.big{font-size:90px;display:block;margin:10px auto}.bx-card small{font:700 11px Cairo;color:#475569;text-align:center;line-height:1.6}
+.shake2{animation:shk2 .25s linear infinite}@keyframes shk2{25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+.bx-rw{display:flex;flex-direction:column;gap:6px;font:800 18px Cairo;margin:8px 0}.bx-rw div{background:#f1f5f9;border-radius:14px;padding:10px}
+/* home rewards row + result extras */
+.rw-row .btn{position:relative}.rw-row i{position:absolute;top:-4px;inset-inline-end:-4px;width:14px;height:14px;border-radius:50%;background:#ef4444;border:2px solid #fff;display:none}
+.res-hard{margin-top:10px;text-align:center}.res-hard .btn{margin-top:8px;width:100%}
+/* font size + quality + landscape */
+.scr:not(#hud){zoom:var(--fz,1)}
+.lq .scr.on{animation:none}
+@media(orientation:landscape) and (max-height:520px){#home.on{padding-top:8px;gap:6px}.pet-home{min-height:70px}.pet-home .pet-svg{width:60px;height:66px}.hero-mark{transform:scale(.8)}}

@@ -1,0 +1,20 @@
+.pet-home{display:flex;align-items:center;justify-content:center;gap:10px;margin:2px auto;cursor:pointer;min-height:96px}
+.pet-bub{background:#fff;color:#102744;border-radius:18px;padding:7px 12px;font:800 14px Cairo;max-width:190px;box-shadow:0 4px 0 #94a3b8}
+.pet-svg{width:84px;height:92px;flex:none;animation:pbr 3s ease-in-out infinite}.pet-big .pet-svg{width:150px;height:164px}
+@keyframes pbr{50%{transform:scale(1.04) translateY(-2px)}}
+.pet-hop .pet-svg{animation:phop .6s}@keyframes phop{30%{transform:translateY(-16px) scale(1.06)}60%{transform:translateY(0) scale(.97)}}
+.pet-bar{height:14px;border-radius:9px;background:#e2e8f0;overflow:hidden}.pet-bar i{display:block;height:100%;background:linear-gradient(90deg,#4ade80,#16a34a);transition:width .4s}
+.pet-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.pet-row .btn{flex:1 1 40%;min-width:0}
+.pet-acc.on{outline:3px solid #22c55e}
+@media(prefers-reduced-motion:reduce){.pet-svg,.pet-hop .pet-svg{animation:none}}
+/* ===== panda v2: tabs, shop grid, room ===== */
+.pet-tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}.pet-tabs::-webkit-scrollbar{display:none}
+.pet-tabs button{flex:none;display:flex;flex-direction:column;align-items:center;min-width:58px;border:2px solid #cbd5e1;border-radius:14px;background:#f1f5f9;color:#0c2748;font:800 12px Cairo;padding:4px 6px}.pet-tabs button span{font-size:20px}.pet-tabs button.on{background:linear-gradient(#38bdf8,#0369a1);border-color:#fff;color:#fff}
+.pet-room{border-radius:20px;padding:6px 0;display:flex;justify-content:center;overflow:hidden}.pet-mini{position:relative;display:flex;justify-content:center}.pet-mini .pet-svg{width:92px;height:101px}.pet-big{position:relative}
+.pet-bar.xp i{background:linear-gradient(90deg,#fbbf24,#f59e0b)}
+.pet-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pet-card{border:3px solid #cbd5e1;border-radius:16px;background:#fff;padding:6px;display:flex;flex-direction:column;align-items:center;gap:3px;color:#0c2748}.pet-card.on{box-shadow:0 0 0 3px #22c55e66}
+.pet-card b{font:800 14px Cairo}.pet-card small{font:700 11px Cairo;color:#475569;text-align:center}.pet-card .btn{width:100%;min-height:38px;font-size:14px;padding:4px}
+.pc-pv{height:70px;display:flex;align-items:center;justify-content:center;font-size:44px}.pc-room{display:block;width:60px;height:60px;border-radius:14px;border:2px solid #fff}
+.pet-svg.sm{width:64px;height:70px;animation:none}
+.pet-fl{position:absolute;top:0;left:50%;font-size:34px;animation:pfl 1.2s ease-out forwards;pointer-events:none}@keyframes pfl{from{transform:translate(-50%,0) scale(1)}to{transform:translate(-50%,40px) scale(.2);opacity:0}}
