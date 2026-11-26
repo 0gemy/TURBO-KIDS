@@ -97,7 +97,7 @@ function mat(c,o){return new T.MeshStandardMaterial(Object.assign({color:c,rough
 const TIRE=new T.MeshStandardMaterial({color:0x14161b,roughness:.85,metalness:0});
 const CHROME=new T.MeshStandardMaterial({color:0xf2f4f8,roughness:.12,metalness:1,envMapIntensity:1.4});
 const DARKM=new T.MeshStandardMaterial({color:0x1b1f27,roughness:.55,metalness:.4});
-const GLASSM=()=>new T.MeshPhysicalMaterial({color:0x0b1a2e,roughness:.04,metalness:.9,clearcoat:1,clearcoatRoughness:.03,envMapIntensity:1.8});
+const GLASSM=()=>window.__gfxTier==='low'?new T.MeshStandardMaterial({color:0x0b1a2e,roughness:.2,metalness:.8}):new T.MeshPhysicalMaterial({color:0x0b1a2e,roughness:.04,metalness:.9,clearcoat:1,clearcoatRoughness:.03,envMapIntensity:1.8});
 const HEADM=new T.MeshStandardMaterial({color:0xfff6d0,emissive:0xffe8a0,emissiveIntensity:2.2,roughness:.2});
 const TAILM=new T.MeshStandardMaterial({color:0xff2020,emissive:0xff1010,emissiveIntensity:2,roughness:.3});
 function tireGeo(rr){
@@ -122,7 +122,7 @@ function upgradeWheel(w,rr,rimColor){
 }
 function boxM(g,w,h,l,m,x,y,z){const e=new T.Mesh(new T.BoxGeometry(w,h,l),m);e.position.set(x,y,z);g.add(e);return e}
 function cylM(g,rt,rb,h,m,x,y,z,rx,ry,rz){const e=new T.Mesh(new T.CylinderGeometry(rt,rb,h,16),m);e.position.set(x,y,z);e.rotation.set(rx||0,ry||0,rz||0);g.add(e);return e}
-function sprite(g,color,x,y,z,s,op){const m=new T.Sprite(new T.SpriteMaterial({map:glow(),color:color,transparent:true,opacity:op,blending:T.AdditiveBlending,depthWrite:false}));m.position.set(x,y,z);m.scale.set(s,s,1);g.add(m);return m}
+function sprite(g,color,x,y,z,s,op){if(window.__gfxTier==='low')return {position:{set(){}},scale:{set(){}},material:{}};const m=new T.Sprite(new T.SpriteMaterial({map:glow(),color:color,transparent:true,opacity:op,blending:T.AdditiveBlending,depthWrite:false}));m.position.set(x,y,z);m.scale.set(s,s,1);g.add(m);return m}
 
 function decorate(g,c){
   const M=g.userData.m;if(!M)return;const {L,W,bt,h}=M;
@@ -253,7 +253,7 @@ buildCarGroup=function(idx,color){
   // smooth curvy bodies: round the profile and use a softer bevel while the base builder runs
   const OE=T.ExtrudeGeometry;
   T.ExtrudeGeometry=function(s,o){
-    o=Object.assign({},o||{},{bevelSize:.11,bevelThickness:.09,bevelSegments:6,curveSegments:10});
+    o=Object.assign({},o||{},{bevelSize:.11,bevelThickness:.09,bevelSegments:(window.__gfxTier==='high'?6:window.__gfxTier==='mid'?3:2),curveSegments:(window.__gfxTier==='high'?10:6)});
     return new OE(smoothShape(s),o);
   };
   let g;try{g=prevBuild(idx,color)}finally{T.ExtrudeGeometry=OE}
