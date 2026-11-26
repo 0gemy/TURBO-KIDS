@@ -14,7 +14,7 @@ function merge(l,r){if(!r)return l;const rb=score(r)>=score(l),b=rb?r:l,o=rb?l:r
  m.wheel=((b.wheel||{}).ts||0)>=((o.wheel||{}).ts||0)?b.wheel:o.wheel;m.bx=((b.bx||{}).ts||0)>=((o.bx||{}).ts||0)?b.bx:o.bx;m.pet=mp(b.pet,o.pet);delete m.sid;return m}
 function mp(a,b){if(!a||!b)return a||b;const sc=x=>(x.lv||1)*1e6+(x.xp||0),x=sc(a)>=sc(b)?a:b,y=x===a?b:a,m=Object.assign({},x);
  m.own=[...new Set([...(a.own||[]),...(b.own||[])])];m.inv=Object.assign({},y.inv);for(const k in x.inv)m.inv[k]=Math.max(+x.inv[k]||0,+(y.inv||{})[k]||0);return m}
-const _sn=syncNow;
+window._tkMerge=merge;const _sn=syncNow;
 syncNow=async function(){if(!A)return _sn();if(syncBusy||!navigator.onLine||!location.protocol.startsWith('http'))return;syncBusy=1;
  try{const j=await api('save',{u:A.u,tok:A.tok,d:slim()});if(j.ok){S.sync=Date.now();svLocal()}else if(j.code===401){setA(null)}}catch(e){}syncBusy=0};
 function apply(j){S=Object.assign(def(),merge(S,j.d),{v:1});svLocal()}
