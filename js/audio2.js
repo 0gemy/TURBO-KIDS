@@ -81,6 +81,7 @@
     try{
       const f=q&&(q.lang==='en'&&q.sp?'en-'+hxs(q.sp)+'.mp3':key(q.a));
       if(f&&AC&&S.set.L){
+        if(praiseOn){pending=null;const qq=q;const w=setInterval(()=>{if(!praiseOn){clearInterval(w);window.say(qq)}},60);setTimeout(()=>clearInterval(w),6500);return}
         const my=++gen;stopOld();stopVoice();busy=true;
         speakClip(f,my,()=>{if(my===gen){gen++;prevSay.call(null,q)}});
         return;
@@ -131,14 +132,37 @@
       step();
     });
   }
+  // Praise ("ممتاز", "شاطر", "Great job!") must finish before the next prompt: a call made while praise is
+  // still playing is queued (latest wins) and runs when the praise ends, instead of cutting it off.
+  let praiseOn=false,pending=null,praiseTimer=0;
+  const FIXED_PRAISE=['ممتاز يا بطل','Great job!'];
+  function isPraise(t){
+    const s=String(t==null?'':t).trim();if(!s)return false;
+    try{if(typeof PR!=='undefined'&&PR.indexOf(t)>=0)return true}catch(e){}
+    try{if(typeof PRE!=='undefined'&&PRE.indexOf(t)>=0)return true}catch(e){}
+    return FIXED_PRAISE.some(p=>s.indexOf(p)===0);
+  }
+  function praiseDone(){
+    clearTimeout(praiseTimer);if(!praiseOn)return;praiseOn=false;
+    const p=pending;pending=null;
+    if(p&&!(typeof paused!=='undefined'&&paused))window.tts(p[0],p[1]);
+  }
   if(prevTts){window.tts=tts=function(t,lg){
     try{
       if(AC&&S.set.L){
+        if(praiseOn){pending=[t,lg];return}
         const cs=cands(t,lg);
         if(cs.length){
           if(!cs.some(have))loadMg();
+          const pr=isPraise(t);
           const my=++gen;stopOld();stopVoice();
-          findClip(cs,2200).then(b=>{if(my!==gen)return;if(b){if(AC.state==='suspended')AC.resume();playBuf(b)}else prevTts(t,lg)});
+          if(pr){praiseOn=true;pending=null;clearTimeout(praiseTimer);praiseTimer=setTimeout(praiseDone,6000)}
+          findClip(cs,2200).then(b=>{
+            if(my!==gen){if(pr)praiseDone();return}
+            if(b){if(AC.state==='suspended')AC.resume();
+              if(pr){playBuf(b,praiseDone);const s0=src;if(s0)clearTimeout(praiseTimer),praiseTimer=setTimeout(praiseDone,Math.ceil(b.duration*1000)+800)}
+              else playBuf(b)}
+            else{if(pr)praiseDone();prevTts(t,lg)}});
           return;
         }
       }
