@@ -1,4 +1,4 @@
-// Purchase confirmation, daily lucky wheel, loot boxes, lobby (home screen) themes, extra mini-games.
+// Purchase confirmation, lucky wheel, loot boxes, lobby (home screen) themes, extra mini-games.
 (function(){
 const E=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]),$$=i=>document.getElementById(i);
 const today=()=>new Date().toLocaleDateString('en-CA'),clockOk=t=>Date.now()>=(+t||0)-6e4,ri=a=>a[0]+Math.floor(Math.random()*(a[1]-a[0]+1));
@@ -39,33 +39,38 @@ function lobby(){const o=modal('<b class="mdl-t">🏠 ثيمات الصفحة ا
  G.onclick=e=>{const u=e.target.closest('[data-u]'),b=e.target.closest('[data-b]');if(u){S.lb=u.dataset.u;sv();applyLb();draw()}
   else if(b){const l=LB.find(x=>x[0]===b.dataset.b);askBuy({n:'ثيم '+l[1],p:l[2],pv:'<div class="lb-pv big" style="background:'+l[3]+'"></div>'},()=>{S.coins-=l[2];S.ownL.push(l[0]);S.lb=l[0];sv();hud();applyLb();draw()})}};draw()}
 // ---------- daily lucky wheel ----------
-const WP=[['50💎','c',50,30],['100💎','c',100,25],['200💎','c',200,15],['500💎','c',500,5],['1000💎','c',1000,2],['10000💎','c',1e4,.2],['40 XP','x',40,12],['100 XP','x',100,6],['🍯 عسل','f','honey',4.8]],WC=['#38bdf8','#34d399','#fbbf24','#fb923c','#a78bfa','#facc15','#60a5fa','#f472b6','#f87171'];
+const WP=[['💎','50','c',50,24],['⭐','30','x',30,16],['💎','100','c',100,18],['⭐','60','x',60,12],['💎','200','c',200,11],['⭐','120','x',120,8],['💎','500','c',500,5.5],['⭐','250','x',250,3.5],['💎','1000','c',1000,1.8],['👑','10000','c',1e4,.2]],
+WC=[['#38bdf8','#0ea5e9'],['#fbbf24','#f59e0b'],['#34d399','#10b981'],['#f472b6','#ec4899'],['#a78bfa','#8b5cf6'],['#fb923c','#f97316'],['#60a5fa','#3b82f6'],['#facc15','#eab308'],['#4ade80','#22c55e'],['#f87171','#ef4444']];
 const wOk=()=>{const w=S.wheel||{};return w.d!==today()&&clockOk(w.ts)},bOk=()=>{const b=S.bx||{};return b.d!==today()&&clockOk(b.ts)};
-function wheel(){const n=WP.length,a=360/n,pt=d=>[(100*Math.sin(d*Math.PI/180)).toFixed(1),(-100*Math.cos(d*Math.PI/180)).toFixed(1)];
- const w=WP.map((p,i)=>{const [x1,y1]=pt(i*a),[x2,y2]=pt((i+1)*a);return '<path d="M0 0L'+x1+' '+y1+'A100 100 0 0 1 '+x2+' '+y2+'Z" fill="'+WC[i]+'" stroke="#fff" stroke-width="2"/><text transform="rotate('+((i+.5)*a)+') translate(0,-64)" text-anchor="middle" font-size="13" font-weight="800" fill="#0c2748">'+p[0]+'</text>'}).join('');
- const o=modal('<b class="mdl-t">🎡 عجلة الحظ اليومية</b><div class="wh"><div class="wh-p">▼</div><svg viewBox="-104 -104 208 208"><g id="wG">'+w+'</g><circle r="13" fill="#fff" stroke="#0c2748" stroke-width="3"/></svg></div><small>أعلى جائزة: 10000 💎 (نادرة جدًا!)</small><div id="wM" class="mdl-m"></div><button class="btn g" id="wS">'+(wOk()?'🎡 لفّ العجلة':'تعالى بكرة 🌙')+'</button><button class="btn s" data-x>إغلاق</button>'),M=o.querySelector('#wM'),B=o.querySelector('#wS');
+const dOk=()=>S.day!==new Date().toDateString();
+function wheel(){const n=WP.length,a=360/n,pt=(d,r)=>[(r*Math.sin(d*Math.PI/180)).toFixed(1),(-r*Math.cos(d*Math.PI/180)).toFixed(1)];
+ const defs='<defs>'+WC.map((c,i)=>'<linearGradient id="wg'+i+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+c[0]+'"/><stop offset="1" stop-color="'+c[1]+'"/></linearGradient>').join('')+'<radialGradient id="wrim" cx=".5" cy=".5" r=".5"><stop offset=".9" stop-color="#fde68a"/><stop offset="1" stop-color="#f59e0b"/></radialGradient><radialGradient id="whub" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fbbf24"/></radialGradient></defs>';
+ const w=WP.map((p,i)=>{const [x1,y1]=pt(i*a,92),[x2,y2]=pt((i+1)*a,92);return '<path d="M0 0L'+x1+' '+y1+'A92 92 0 0 1 '+x2+' '+y2+'Z" fill="url(#wg'+i+')" stroke="#fff" stroke-width="1.5"/><g transform="rotate('+((i+.5)*a)+')"><text y="-68" text-anchor="middle" font-size="17">'+p[0]+'</text><text y="-50" text-anchor="middle" font-size="14" font-weight="800" fill="#fff" stroke="#0c2748" stroke-width=".6" paint-order="stroke">'+p[1]+'</text></g>'}).join('');
+ const bulbs=Array.from({length:16},(_,i)=>{const [x,y]=pt(i*22.5,100);return '<circle cx="'+x+'" cy="'+y+'" r="3.4" class="wb'+(i%2)+'"/>'}).join('');
+ const o=modal('<b class="mdl-t">🎡 عجلة الحظ اليومية</b><div class="wh"><div class="wh-p"></div><svg viewBox="-110 -110 220 220">'+defs+'<circle r="108" fill="url(#wrim)"/><g id="wG">'+w+'</g><g class="wbl">'+bulbs+'</g><circle r="16" fill="url(#whub)" stroke="#b45309" stroke-width="3"/></svg></div><small>عملات 💎 ونقاط خبرة ⭐ ترفع مستواك. أعلى جائزة 10000 💎 👑</small><div id="wM" class="mdl-m"></div><button class="btn g" id="wS">'+(wOk()?'🎡 لفّ العجلة':'تعالى بكرة 🌙')+'</button><button class="btn s" data-x>إغلاق</button>'),M=o.querySelector('#wM'),B=o.querySelector('#wS');
  B.onclick=()=>{if(!wOk()){M.textContent=clockOk((S.wheel||{}).ts)?'استخدمت لفتك النهاردة، تعالى بكرة 🌙':'ساعة الجهاز غير صحيحة';return}
-  let r=Math.random()*100,i=0;for(;i<n-1;i++){r-=WP[i][3];if(r<0)break}const p=WP[i];
+  let r=Math.random()*100,i=0;for(;i<n-1;i++){r-=WP[i][4];if(r<0)break}const p=WP[i];
   S.wheel={d:today(),ts:Date.now()};B.disabled=true;B.textContent='...';
-  if(p[1]==='c')S.coins+=p[2];else if(p[1]==='x')petXp(p[2]);else petGrant(PETCAT.foods[p[2]],1);sv();hud();dots();
+  if(p[2]==='c')S.coins+=p[3];else petXp(p[3]);sv();hud();dots();
   const g=o.querySelector('#wG');g.style.transition='transform 4s cubic-bezier(.12,.7,.1,1)';void g.getBoundingClientRect();g.style.transform='rotate('+(360*5+360-(i+.5)*a)+'deg)';
-  setTimeout(()=>{M.innerHTML='🎉 كسبت <b>'+p[0]+'</b>!';B.textContent='تعالى بكرة 🌙'},4200)}}
+  setTimeout(()=>{M.innerHTML='🎉 كسبت <b>'+(p[2]==='x'?'⭐ '+p[1]+' XP':'💎 '+p[1])+'</b>!';B.textContent='تعالى بكرة 🌙';try{fx(8)}catch(e){}},4200)}}
 // ---------- loot boxes ----------
-const BX=[{id:'b',n:'برونزي',ico:'🥉',p:100,c:[20,150],x:[20,80],ic:.35,a:0,z:1},{id:'s',n:'فضي',ico:'🥈',p:300,c:[80,420],x:[80,240],ic:.5,a:0,z:2},{id:'g',n:'ذهبي',ico:'🥇',p:800,c:[250,1200],x:[200,600],ic:1,a:1,z:3},{id:'d',n:'ماسي',ico:'💎',p:2000,c:[600,3000],x:[600,1600],ic:1,a:2,z:3}],RT=['شائع','نادر','ملحمي','أسطوري'];
+const BX=[{id:'b',n:'برونزي',ico:'🥉',p:100,c:[20,150],x:[20,80],k:'#d97706,#92400e'},{id:'s',n:'فضي',ico:'🥈',p:300,c:[80,420],x:[80,240],k:'#94a3b8,#475569'},{id:'g',n:'ذهبي',ico:'🥇',p:800,c:[250,1200],x:[200,600],k:'#fbbf24,#b45309'},{id:'d',n:'ماسي',ico:'💎',p:2000,c:[600,3000],x:[600,1600],k:'#22d3ee,#6d28d9'}];
 function boxes(){const o=modal('<b class="mdl-t">🎁 الصناديق</b><div id="bxG" class="bx-grid"></div><div class="mdl-m" id="bxM"></div><button class="btn s" data-x>إغلاق</button>'),G=o.querySelector('#bxG');
- const draw=()=>{G.innerHTML=BX.map(b=>{const free=b.id==='b'&&bOk();return '<div class="bx-card"><div class="bx-i">'+b.ico+'</div><b>صندوق '+b.n+'</b><small>🪙 '+b.c[0]+'–'+b.c[1]+' · ⭐ '+b.x[0]+'–'+b.x[1]+' XP<br>🎁 عنصر للباندا: '+Math.round(b.ic*100)+'% ('+RT[b.a]+'–'+RT[b.z]+')</small><button class="btn '+(free?'g':'o')+'" data-o="'+b.id+'">'+(free?'🎁 أول فتح مجاني':'💎 '+b.p)+'</button></div>'}).join('')};
- function open(b){const p=petPool(b.a,b.z);let it=null,q=1,coins=ri(b.c);const xp=ri(b.x);if(Math.random()<b.ic){if(p.length){it=p[Math.floor(Math.random()*p.length)];if(it.food)q=ri([1,3])}else coins=Math.round(coins*1.5)}
-  S.coins+=coins;petXp(xp);if(it)petGrant(it,q);sv();hud();dots();
+ const draw=()=>{G.innerHTML=BX.map(b=>{const free=b.id==='b'&&bOk();return '<div class="bx-card" style="--k1:'+b.k.split(',')[0]+';--k2:'+b.k.split(',')[1]+'"><div class="bx-i">'+b.ico+'</div><b>صندوق '+b.n+'</b><small>💎 '+b.c[0]+'–'+b.c[1]+'<br>⭐ '+b.x[0]+'–'+b.x[1]+' XP</small><button class="btn '+(free?'g':'o')+'" data-o="'+b.id+'">'+(free?'🎁 أول فتح مجاني':'💎 '+b.p)+'</button></div>'}).join('')};
+ function open(b){const coins=ri(b.c),xp=ri(b.x);S.coins+=coins;petXp(xp);sv();hud();dots();
   o.querySelector('.mdl').innerHTML='<div class="bx-i big shake2">'+b.ico+'</div><b class="mdl-t">بيفتح...</b>';
-  setTimeout(()=>{o.querySelector('.mdl').innerHTML='<b class="mdl-t">🎉 صندوق '+b.n+'</b><div class="bx-rw"><div>🪙 +'+coins+' عملة</div><div>⭐ +'+xp+' XP</div>'+(it?'<div style="color:'+PETCAT.rc[it.r||0]+'">'+(it.food?it.e+' '+it.n+' ×'+q:'🎁 '+it.n+' ('+RT[it.r]+')')+'</div>':'')+'</div><button class="btn g" id="bxA">فتح صندوق تاني</button><button class="btn s" data-x>تمام</button>';o.querySelector('#bxA').onclick=()=>{closeAll();boxes()}},1100)}
+  setTimeout(()=>{o.querySelector('.mdl').innerHTML='<div class="bx-burst">✨</div><b class="mdl-t">🎉 صندوق '+b.n+'</b><div class="bx-rw"><div>💎 +'+coins+' عملة</div><div>⭐ +'+xp+' XP</div></div><button class="btn g" id="bxA">فتح صندوق تاني</button><button class="btn s" data-x>تمام</button>';try{fx(8)}catch(e){}o.querySelector('#bxA').onclick=()=>{closeAll();boxes()}},1100)}
  G.onclick=e=>{const k=e.target.closest('[data-o]');if(!k)return;const b=BX.find(x=>x.id===k.dataset.o);
   if(b.id==='b'&&bOk()){S.bx={d:today(),ts:Date.now()};return open(b)}
   askBuy({n:'صندوق '+b.n,p:b.p,pv:'<span class="bx-i">'+b.ico+'</span>'},()=>{S.coins-=b.p;open(b)})};draw()}
-// ---------- home row + shop button + indicators ----------
-function dots(){const r=$$('rwRow');if(!r)return;const d=(k,v)=>{const e=r.querySelector('[data-r="'+k+'"] i');if(e)e.style.display=v?'block':'none'};d('w',wOk());d('b',bOk())}
-(function init(){const h=$$('home'),st=h&&h.querySelector('.home-stats');if(st){const r=document.createElement('div');r.id='rwRow';r.className='row rw-row';r.innerHTML='<button class="btn s p" data-r="w">🎡 العجلة<i></i></button><button class="btn s o" data-r="b">🎁 الصناديق<i></i></button><button class="btn s p" data-r="s">🛍️ شوب الباندا</button><button class="btn s o" data-r="l">🏠 الثيمات</button>';st.before(r);
- r.onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;({w:wheel,b:boxes,s:()=>openPet('f'),l:lobby})[b.dataset.r]()}}
- const si=$$('shopInfo');if(si){const b=document.createElement('button');b.className='btn p';b.textContent='🏠 ثيمات الصفحة الرئيسية';b.onclick=lobby;si.after(b)}
+// ---------- home: rewards sheet, more sheet, red dot ----------
+function dots(){const d=wOk()||bOk()||dOk(),i=document.querySelector('#rwBtn i');if(i)i.style.display=d?'block':'none';document.querySelectorAll('.rwd-dot').forEach(e=>e.style.display='none');[['w',wOk()],['b',bOk()],['d',dOk()]].forEach(([k,v])=>{const e=document.querySelector('[data-rw="'+k+'"] i');if(e)e.style.display=v?'block':'none'})}
+window.openRewards=function(){const o=modal('<b class="mdl-t">🎁 المكافآت</b><div class="sheet"><button data-rw="w" class="sh-p"><span>🎡</span>عجلة الحظ<i></i></button><button data-rw="b" class="sh-o"><span>🎁</span>الصناديق<i></i></button><button data-rw="d" class="sh-g"><span>📅</span>مكافأة اليوم<i></i></button><button data-rw="l" class="sh-b"><span>🏠</span>ثيمات الرئيسية</button></div><button class="btn s" data-x>إغلاق</button>');dots();
+ o.querySelector('.sheet').onclick=e=>{const b=e.target.closest('[data-rw]');if(!b)return;const k=b.dataset.rw;if(k==='d'){daily();dots();return}closeAll();({w:wheel,b:boxes,l:lobby})[k]()}};
+window.openMore=function(){const o=modal('<b class="mdl-t">☰ المزيد</b><div class="sheet"><button data-mo="profile" class="sh-p"><span>👤</span>شخصيتي</button><button data-mo="alb" class="sh-o"><span>📒</span>الألبوم</button><button data-mo="prog" class="sh-g"><span>🏆</span>الإنجازات</button><button data-mo="set" class="sh-b"><span>⚙️</span>الإعدادات</button></div><div class="site-credit" style="color:#475569">مسؤول الموقع: <b>Gamal Mohamed</b> · تطوير <b>GEMY</b></div><button class="btn s" data-x>إغلاق</button>');
+ o.querySelector('.sheet').onclick=e=>{const b=e.target.closest('[data-mo]');if(!b)return;o.remove();go(b.dataset.mo)}};
+(function init(){const si=$$('shopInfo');if(si){const b=document.createElement('button');b.className='btn p';b.textContent='🏠 ثيمات الصفحة الرئيسية';b.onclick=lobby;si.after(b)}
  const _h=hud;hud=function(){_h();dots()};applyLb();dots()})();
 // ---------- extra mini-games ----------
 const sh=a=>typeof shuf==='function'?shuf(a):a.sort(()=>Math.random()-.5),rn2=n=>Math.floor(Math.random()*n);
