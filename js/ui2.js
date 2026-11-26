@@ -110,6 +110,7 @@ const P={
  gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M5 12v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-8"/><path d="M12 8C9 8 7 6.8 7 5.3A2.3 2.3 0 0 1 9.3 3C11 3 12 5 12 8zM12 8c3 0 5-1.2 5-2.7A2.3 2.3 0 0 0 14.7 3C13 3 12 5 12 8z"/>',
  login:'<path d="M15 3h3a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3h-3"/><path d="M10 17l5-5-5-5M15 12H3"/>',
  menu:'<path d="M4 7h16M4 12h16M4 17h10"/>',
+ user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
  chev:'<path d="M15 5l-7 7 7 7"/>'
 };
 const svg=(n,c)=>'<svg class="ic'+(c?' '+c:'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P[n]+'</svg>';
@@ -132,6 +133,9 @@ function modern(){
  ['pad','gift','login','menu'].forEach((n,i)=>{const b=nav[i];if(b)swap(b.querySelector('span'),n)});
  h.querySelectorAll('.hm-nav span').forEach(s=>s.classList.add('nv-ic'));
 }
+function fixAcc(){const b=document.getElementById('accBtn');if(!b)return;const sp=b.querySelector('span');if(!sp||sp.querySelector('svg'))return;
+ const on=sp.textContent.indexOf('\uD83D\uDD10')<0;sp.className='nv-ic';sp.innerHTML=svg(on?'user':'login')}
+const ab=document.getElementById('accBtn');if(ab){try{new MutationObserver(()=>{try{fixAcc()}catch(e){}}).observe(ab,{childList:true})}catch(e){}}
 try{modern()}catch(e){}
 document.addEventListener('DOMContentLoaded',()=>{try{modern()}catch(e){}});
 })();
