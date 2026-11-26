@@ -1,0 +1,43 @@
+/* settings + achievements redesign (additive) */
+#set,#prog{justify-content:flex-start}
+#set h2,#prog h2{margin:4px 0 2px;font:900 28px Cairo;color:#102744}
+.st-sec{width:min(100%,420px);background:#fff;border-radius:22px;padding:6px 10px 10px;box-shadow:0 6px 0 #cbd5e1;text-align:right}
+.st-sec>h3{margin:6px 6px 4px;font:800 15px Cairo;color:#0369a1;display:flex;align-items:center;gap:6px}
+.st-sec .btn,.st-sec .volume-box{width:100%;min-height:52px;margin:6px 0 0;border-radius:16px;box-shadow:none;background:#f1f5f9;color:#102744;border:2px solid #e2e8f0;font:700 17px Cairo;text-align:right;display:flex;align-items:center;justify-content:space-between;padding:8px 14px;text-shadow:none}
+.st-sec .btn:active{background:#e0f2fe}
+.st-sec .volume-box{display:block;padding:10px 14px}
+.st-sec .volume-box label{display:flex;justify-content:space-between;font:700 17px Cairo;color:#102744}
+.st-sec .volume-box small{display:none}
+.st-sec .volume-box input{width:100%;margin-top:6px;accent-color:#38BDF8}
+.st-sec .btn.p,.st-sec .btn.o{color:#102744}
+#set .st-back,#prog .st-back{margin:6px 0 14px}
+html.rm *,html.rm *::before,html.rm *::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
+/* achievements */
+.ac-hero{width:min(100%,420px);background:linear-gradient(135deg,#0ea5e9,#6366f1);color:#fff;border-radius:24px;padding:14px;box-shadow:0 6px 0 #1e3a8a55;display:flex;align-items:center;gap:14px}
+.ac-ring{--p:0;width:92px;height:92px;border-radius:50%;background:conic-gradient(#facc15 calc(var(--p)*1%),#ffffff33 0);display:grid;place-items:center;flex:none}
+.ac-ring div{width:72px;height:72px;border-radius:50%;background:#1e3a8a;display:flex;flex-direction:column;align-items:center;justify-content:center;font:900 22px Poppins,Cairo;line-height:1}
+.ac-ring small{font:700 11px Cairo;opacity:.8;margin-top:2px}
+.ac-hero h3{margin:0;font:900 20px Cairo}.ac-hero p{margin:2px 0 0;font:600 13px Cairo;opacity:.9}
+.ac-stats{width:min(100%,420px);display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.ac-stats div{background:#fff;border-radius:14px;padding:6px 2px;text-align:center;box-shadow:0 3px 0 #cbd5e1}
+.ac-stats i{font-style:normal;font-size:18px;display:block}.ac-stats b{font:800 15px Poppins,Cairo;display:block;color:#102744}.ac-stats span{font:600 11px Cairo;color:#64748b}
+.ac-tabs{width:min(100%,420px);display:flex;gap:6px;background:#ffffffaa;border-radius:16px;padding:4px}
+.ac-tabs button{flex:1;border:0;border-radius:12px;padding:8px 4px;font:800 14px Cairo;background:transparent;color:#334155}
+.ac-tabs button.on{background:#0ea5e9;color:#fff;box-shadow:0 2px 0 #0369a1}
+.ac-list{width:min(100%,420px);display:flex;flex-direction:column;gap:8px}
+.ac-card{display:flex;align-items:center;gap:12px;background:#fff;border-radius:20px;padding:10px 12px;box-shadow:0 4px 0 #cbd5e1;border:3px solid transparent;text-align:right}
+.ac-card.claim{border-color:#facc15;background:linear-gradient(#fffbeb,#fff);animation:acPulse 1.6s ease-in-out infinite}
+.ac-card.done{border-color:#bbf7d0}
+.ac-ic{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;background:#e2e8f0;flex:none;filter:grayscale(1);opacity:.75}
+.ac-card.claim .ac-ic,.ac-card.done .ac-ic{background:linear-gradient(#fde68a,#f59e0b);filter:none;opacity:1}
+.ac-mid{flex:1;min-width:0}.ac-mid b{font:800 16px Cairo;color:#102744;display:block}.ac-mid em{font:600 12px Cairo;color:#64748b;font-style:normal;display:block}
+.ac-bar{height:9px;border-radius:5px;background:#e2e8f0;margin-top:5px;overflow:hidden}.ac-bar i{display:block;height:100%;border-radius:5px;background:#38BDF8}
+.ac-card.claim .ac-bar i,.ac-card.done .ac-bar i{background:#22c55e}
+.ac-end{flex:none;min-width:48px;text-align:center;font:800 13px Poppins,Cairo;color:#475569}
+.ac-end .ach-claim{border:0;border-radius:14px;background:linear-gradient(#fbbf24,#f59e0b);color:#422006;font:900 14px Cairo;padding:9px 12px;box-shadow:0 3px 0 #b45309}
+.ac-end .ok{font-size:24px}
+.ac-empty{padding:20px;color:#64748b;font:700 15px Cairo;text-align:center}
+#prog .ach-bonus{width:min(100%,420px);margin:2px 0;background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:20px;padding:12px;text-align:center;font:800 15px Cairo;color:#78350f;box-shadow:0 4px 0 #f59e0b88}
+#prog .ach-bonus .ach-claim{border:0;border-radius:14px;background:#f59e0b;color:#fff;font:900 16px Cairo;padding:10px 14px;box-shadow:0 3px 0 #b45309}
+#prog #rev{width:min(100%,420px);border-radius:20px}
+@keyframes acPulse{50%{box-shadow:0 4px 0 #cbd5e1,0 0 14px #facc1599}}
