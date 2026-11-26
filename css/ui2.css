@@ -4,6 +4,11 @@
 .st-sec{width:min(100%,420px);background:#fff;border-radius:22px;padding:6px 10px 10px;box-shadow:0 6px 0 #cbd5e1;text-align:right}
 .st-sec>h3{margin:6px 6px 4px;font:800 15px Cairo;color:#0369a1;display:flex;align-items:center;gap:6px}
 .st-sec .btn,.st-sec .volume-box{width:100%;min-height:52px;margin:6px 0 0;border-radius:16px;box-shadow:none;background:#f1f5f9;color:#102744;border:2px solid #e2e8f0;font:700 17px Cairo;text-align:right;display:flex;align-items:center;justify-content:space-between;padding:8px 14px;text-shadow:none}
+#set,#prog{justify-content:flex-start}
+#set h2,#prog h2{margin:4px 0 2px;font:900 28px Cairo;color:#102744}
+.st-sec{width:min(100%,420px);background:#fff;border-radius:22px;padding:6px 10px 10px;box-shadow:0 6px 0 #cbd5e1;text-align:right}
+.st-sec>h3{margin:6px 6px 4px;font:800 15px Cairo;color:#0369a1;display:flex;align-items:center;gap:6px}
+.st-sec .btn,.st-sec .volume-box{width:100%;min-height:52px;margin:6px 0 0;border-radius:16px;box-shadow:none;background:#f1f5f9;color:#102744;border:2px solid #e2e8f0;font:700 17px Cairo;text-align:right;display:flex;align-items:center;justify-content:space-between;padding:8px 14px;text-shadow:none}
 .st-sec .btn:active{background:#e0f2fe}
 .st-sec .volume-box{display:block;padding:10px 14px}
 .st-sec .volume-box label{display:flex;justify-content:space-between;font:700 17px Cairo;color:#102744}
@@ -41,3 +46,17 @@ html.rm *,html.rm *::before,html.rm *::after{animation-duration:.001s!important;
 #prog .ach-bonus .ach-claim{border:0;border-radius:14px;background:#f59e0b;color:#fff;font:900 16px Cairo;padding:10px 14px;box-shadow:0 3px 0 #b45309}
 #prog #rev{width:min(100%,420px);border-radius:20px}
 @keyframes acPulse{50%{box-shadow:0 4px 0 #cbd5e1,0 0 14px #facc1599}}
+
+
+/* home account chip + account panel */
+.hm-acc{position:relative;flex:none;width:48px;height:48px;border-radius:50%;border:3px solid #fff;background:linear-gradient(135deg,#e0f2fe,#99f6e4);display:grid;place-items:center;box-shadow:0 5px 18px #06132655;cursor:pointer;padding:0;overflow:hidden}
+.hm-acc-av{width:100%;height:100%;border-radius:50%;object-fit:cover;font-size:25px;display:grid;place-items:center;line-height:1}
+.hm-acc-on{position:absolute;bottom:1px;left:1px;width:12px;height:12px;border-radius:50%;background:#22c55e;border:2px solid #fff;z-index:2}
+.acc-panel{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;text-align:center}
+.acc-av{width:92px;height:92px;border-radius:50%;border:4px solid #fff;background:linear-gradient(135deg,#e0f2fe,#99f6e4);box-shadow:0 6px 0 #cbd5e1;display:grid;place-items:center;overflow:hidden}
+.acc-av-in{width:100%;height:100%;object-fit:cover;font-size:46px;display:grid;place-items:center;line-height:1}
+.acc-name{font:900 22px Cairo;color:#102744}
+.acc-mail{display:flex;align-items:center;justify-content:center;gap:7px;background:#f1f5f9;border:2px solid #e2e8f0;border-radius:14px;padding:8px 14px;font:700 14px Cairo;color:#334155;max-width:100%}
+.acc-mail span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acc-mail.guest{font-size:13px;color:#64748b}
+.acc-panel .btn{width:100%;margin:0}
