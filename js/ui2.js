@@ -316,3 +316,42 @@ const _ab=window.askBuy;
 if(typeof _ab==='function')window.askBuy=function(x,ok){try{if(x&&!x.pv&&x.ico&&['🌦️','🛣️','🖼️','🚪'].indexOf(x.ico)>=0){const it=shopList().find(v=>v.n===x.n);if(it){if(shopTab==='f')x.pv='<div class="wk-pv pvf" style="border-radius:14px;height:96px;width:220px;margin:0 auto">'+frameMini(it)+'</div>';else{const k=KIND()&&SPEC[KIND()](it).key,u=k&&mem[k];if(u)x.pv='<img alt="" src="'+u+'" style="width:220px;max-width:100%;border-radius:14px;display:block;margin:0 auto">'}}}}catch(e){0}return _ab.call(this,x,ok)};
 window.__shopPreview={mem,Q,snap:()=>decorate()};
 })();
+
+/* daily reward streak + WhatsApp share (additive) */
+(function(){
+const _st=document.createElement('style');_st.textContent="/* daily reward + share */\n.dr-st{font:800 17px Cairo;color:#c2410c}.dr-g{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}\n.dr-d{border-radius:14px;background:#f1f5f9;border:2px solid #e2e8f0;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:2px;font:700 12px Cairo;color:#475569}\n.dr-d span{font-size:22px}.dr-d b{font:800 15px Cairo;color:#102744}.dr-d.dn{background:#dcfce7;border-color:#86efac}.dr-d.td{background:#fff7ed;border-color:#fb923c;box-shadow:0 0 0 3px #fdba7459;animation:drp 1.2s infinite alternate}\n.dr-d:nth-child(7){grid-column:span 2}@keyframes drp{to{transform:scale(1.06)}}.dr-m{min-height:22px;font:700 14px Cairo;color:#475569}\n.btn.wa{background:linear-gradient(#34d36b,#16a34a)!important;box-shadow:0 6px 0 #0f7a36,0 12px 18px rgba(0,0,0,.25)!important;color:#fff}\n.sheet .sh-wa{grid-column:1/-1;background:linear-gradient(145deg,#34d36b,#16a34a)}";document.head.appendChild(_st);
+const RW=[50,70,90,120,160,220,350],$$=id=>document.getElementById(id);
+const dk=d=>d.toDateString(),yest=()=>{const d=new Date();d.setDate(d.getDate()-1);return dk(d)};
+const bonus=n=>Math.min(Math.floor(n/7),4)*50;
+function st(){const t=dk(new Date()),claimed=S.day===t,y=S.day===yest(),s=S.streak|0;
+ const done=claimed?((s-1)%7)+1:(y?s:0)%7,total=claimed?s:(y?s:0),start=total-done;
+ return{claimed,done,total,b:bonus(start),next:claimed?null:done}}
+function rw(i,b){return RW[i]+b}
+function open(){try{ac()}catch(e){}
+ const q=st(),days=RW.map((_,i)=>{const cls=i<q.done?'dr-d dn':(i===q.next?'dr-d td':'dr-d'),r=rw(i,q.b);
+  return '<div class="'+cls+'"><small>يوم '+(i+1)+'</small><span>'+(i<q.done?'✅':i===6?'🎁':'💎')+'</span><b>'+r+'</b></div>'}).join('');
+ const lost=!q.claimed&&!q.done&&(S.streak|0)>0;
+ const o=modal('<b class="mdl-t">📅 مكافأة اليوم</b><div class="dr-st">🔥 أيام متتالية: <b id="drN">'+q.total+'</b></div><div class="dr-g">'+days+'</div><div class="dr-m" id="drM">'+(q.claimed?'استلمت مكافأة اليوم ✓ ارجع بكرة وكمّل السلسلة':lost?'السلسلة اتقطعت، ابدأ من جديد النهاردة 💪':'ادخل كل يوم والمكافأة بتكبر!')+'</div><button class="btn g" id="drC"'+(q.claimed?' disabled':'')+'>'+(q.claimed?'تم الاستلام ✓':'استلم +'+rw(q.next||0,q.b)+' 💎')+'</button><button class="btn p" id="drS">📲 شارك على واتساب</button><button class="btn s" data-x>إغلاق</button>');
+ o.querySelector('#drS').onclick=()=>shareWA('daily');
+ o.querySelector('#drC').onclick=()=>{if(S.day===dk(new Date()))return;const q2=st(),i=q2.next,r=rw(i,q2.b),y=S.day===yest();
+  S.streak=y?(S.streak|0)+1:1;S.day=dk(new Date());S.coins=(S.coins|0)+r;sv();hud();
+  cel('🎁 مكافأة اليوم +'+r+' 💎<br>🔥 أيام متتالية: '+S.streak,2600);o.remove();setTimeout(open,2700)}}
+daily=open;
+// ---------- WhatsApp share ----------
+function lvl(){const e=$$('lvN');return e?e.textContent:'1'}
+function stars(){const e=$$('ts');return e?e.textContent:'0'}
+const URL_=location.origin+'/';
+function shareWA(k){let t;
+ if(k==='res'){let n=0;try{n=S.stars[LV[cur].id]|0}catch(e){}
+  t='🚗 خلصت مرحلة في Turbo Kids وجبت '+'⭐'.repeat(n||1)+'! أنا في مستوى '+lvl()+' ومعايا '+stars()+' نجمة. تعالى العب معايا 👇\n'+URL_}
+ else if(k==='daily'){t='🔥 أنا ماشي '+(S.streak|0)+' يوم ورا بعض في Turbo Kids وبآخد مكافأة كل يوم! 🎁 العب معايا 👇\n'+URL_}
+ else{t='🏁 أنا في مستوى '+lvl()+' وجمعت '+stars()+' نجمة و'+((S.coins|0))+' عملة في Turbo Kids! 🚗 تعالى العب معايا 👇\n'+URL_}
+ const u='https://wa.me/?text='+encodeURIComponent(t);const w=window.open(u,'_blank');if(!w)location.href=u}
+window.shareWA=shareWA;
+(function(){const r=$$('res');if(r&&!$$('shRes')){const b=document.createElement('button');b.id='shRes';b.className='btn wa';b.textContent='📲 شارك نتيجتك على واتساب';b.onclick=()=>shareWA('res');r.appendChild(b)}})();
+const _om=window.openMore;
+if(typeof _om==='function')window.openMore=function(){const r=_om.apply(this,arguments),sh=[...document.querySelectorAll('.mdl .sheet')].pop();
+ if(sh){const b=document.createElement('button');b.className='sh-wa';b.innerHTML='<span>📲</span>شارك اللعبة على واتساب';b.onclick=e=>{e.stopPropagation();shareWA('home')};sh.appendChild(b)}return r};
+// auto prompt once per session when the daily reward is waiting
+setTimeout(()=>{try{const h=$$('home');if(h&&h.classList.contains('on')&&S.day!==dk(new Date())&&!document.querySelector('.dr-g')&&!window.__drShown){window.__drShown=1;open()}}catch(e){}},2200);
+})();
