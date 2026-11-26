@@ -7,6 +7,7 @@
 (function(){
 'use strict';
 const T=THREE;
+const LIGHT=window.__gfxTier!=='high'; // phones: keep the original look and cost, only add the new cars cheaply
 
 /* ---------- helpers ---------- */
 function chaikin(pts,n){for(let k=0;k<n;k++){const o=[];for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length];o.push(new T.Vector2(a.x*.75+b.x*.25,a.y*.75+b.y*.25),new T.Vector2(a.x*.25+b.x*.75,a.y*.25+b.y*.75))}pts=o}return pts}
@@ -60,7 +61,7 @@ function upgradeScene(){
   });
   const rim=new T.DirectionalLight(0x9ec9ff,.35);rim.position.set(-6,4,-8);sc.add(rim);
   // road + ground textures
-  const rt=roadTexture(),gt=grassTexture();
+  const rt=(upgradeScene.rt=upgradeScene.rt||roadTexture()),gt=(upgradeScene.gt=upgradeScene.gt||grassTexture());
   rt.repeat.set(1,1);
   tiles.forEach(g=>{
     const a=g.children[0],b=g.children[1];
@@ -84,9 +85,9 @@ function garageEnv(){
     });
   }catch(e){}
 }
-setInterval(upgradeScene,400);setInterval(garageEnv,300);
+if(!LIGHT){setInterval(upgradeScene,400);setInterval(garageEnv,300);}
 // themes can swap materials: re-apply road/grass maps if needed
-setInterval(()=>{if(!sceneDone)return;try{
+if(!LIGHT)setInterval(()=>{if(!sceneDone)return;try{
   const rt=tiles[0]&&tiles[0].children[1]&&tiles[0].children[1].material.map;
   if(!rt&&tiles.length){sceneDone=false;upgradeScene()}
 }catch(e){}},2500);
@@ -249,6 +250,7 @@ function newDeco(g,c){
 const prevBuild=buildCarGroup;
 buildCarGroup=function(idx,color){
   const c=CARS[idx]||CARS[0];
+  if(LIGHT){const g=prevBuild(idx,color);try{if(idx>=27)newDeco(g,c)}catch(e){}return g}
   if(c.k==='bike'){const g=prevBuild(idx,color);try{(g.userData.wheels||[]).forEach(w=>upgradeWheel(w,.42,c.rim))}catch(e){console.warn(e)}return g}
   // smooth curvy bodies: round the profile and use a softer bevel while the base builder runs
   const OE=T.ExtrudeGeometry;
