@@ -169,3 +169,150 @@ document.addEventListener('DOMContentLoaded',()=>{try{modern()}catch(e){}});
 })();
 
 
+
+// Shop previews: every purchasable item shows the real in-game look (not an emoji).
+// One shared renderer (the game's own), snapshots are taken one at a time, cached as small JPEGs
+// (memory + localStorage) so phones stay smooth. Prices and buy logic are untouched.
+(function(){
+if(typeof THREE==='undefined'||typeof renderWorldShop!=='function')return;
+const PVW=320,PVH=192,VER='pv1';
+const mem={},Q=[];let busy=0,pending={};
+const LS=k=>{try{return localStorage.getItem('tk_'+VER+'_'+k)}catch(e){return null}};
+const LSS=(k,v)=>{try{localStorage.setItem('tk_'+VER+'_'+k,v)}catch(e){try{Object.keys(localStorage).filter(x=>x.indexOf('tk_pv')===0&&x.indexOf('tk_'+VER)!==0).forEach(x=>localStorage.removeItem(x))}catch(_){}}};
+const ready=()=>typeof R!=='undefined'&&R&&typeof sc!=='undefined'&&sc&&typeof cam!=='undefined'&&cam&&carObj&&tiles&&tiles.length;
+const idle=()=>typeof mode==='undefined'||(mode!=='play'&&mode!=='free');
+
+// small stylesheet for previews
+const st=document.createElement('style');
+st.textContent='.wk-pv{height:104px}.wk-pv img.pvi{width:100%;height:100%;object-fit:cover;display:block}.wk-pv.pvl{background:linear-gradient(110deg,#12304f 30%,#1b4670 50%,#12304f 70%);background-size:200% 100%;animation:pvsh 1.3s linear infinite}@keyframes pvsh{to{background-position:-200% 0}}.wk-pv.pvf{display:grid;place-items:center;background:radial-gradient(circle at 50% 40%,#1d4673,#0d2238)}.pvav{width:62px;height:62px;border-radius:50%;border:3px solid #fff;background:#fff3c4;display:grid;place-items:center;font-size:34px;overflow:hidden;box-sizing:border-box}.pvav img{width:100%;height:100%;object-fit:cover;border-radius:50%}';
+document.head.appendChild(st);
+
+// ---- take one snapshot in the real game scene, straight from the game renderer (same tone mapping, same lights) ----
+function snap(spec){
+ const pr=R.getPixelRatio(),sz=R.getSize(new THREE.Vector2()),vw=PVW/pr,vh=PVH/pr;
+ if(vw>sz.x||vh>sz.y)return null;
+ const cv=document.createElement('canvas');cv.width=PVW;cv.height=PVH;const g=cv.getContext('2d');
+ // save
+ const sv0={theme:S.theme,road:S.road,gate:S.gate,eqG:S.eqG,eqR:S.eqR,eqA:S.eqA,
+  cp:cam.position.clone(),cq:cam.quaternion.clone(),fov:cam.fov,asp:cam.aspect,bg:sc.background,fog:sc.fog,
+  cvis:carObj.visible,cpos:carObj.position.clone(),cry:carObj.rotation.y,skyV:skyG&&skyG.visible,skyZ:skyG&&skyG.position.z,
+  shV:shadowM&&shadowM.visible,platV:plat&&plat.visible,fxV:fxP&&fxP.visible,
+  tv:tiles.map(t=>t.visible),gv:gates.map(x=>[x.visible,x.position.clone()]),rd:rainDrops.map(d=>d.visible),
+  vp:R.getViewport(new THREE.Vector4()),sc:R.getScissor(new THREE.Vector4()),sct:R.getScissorTest(),mp:cam.zoom};
+ let ok=false;
+ try{
+  spec.apply();
+  cam.aspect=PVW/PVH;cam.fov=spec.fov||62;cam.updateProjectionMatrix();
+  spec.camera();cam.updateMatrixWorld();
+  R.setScissorTest(true);R.setViewport(0,0,vw,vh);R.setScissor(0,0,vw,vh);
+  R.render(sc,cam);
+  const W=R.domElement.width,H=R.domElement.height;
+  g.drawImage(R.domElement,0,H-PVH,PVW,PVH,0,0,PVW,PVH);ok=true;
+ }catch(e){}
+ // restore
+ try{
+  R.setScissorTest(sv0.sct);R.setViewport(sv0.vp);R.setScissor(sv0.sc);
+  S.theme=sv0.theme;S.road=sv0.road;S.gate=sv0.gate;S.eqG=sv0.eqG;S.eqR=sv0.eqR;S.eqA=sv0.eqA;
+  cam.position.copy(sv0.cp);cam.quaternion.copy(sv0.cq);cam.fov=sv0.fov;cam.aspect=sv0.asp;cam.updateProjectionMatrix();
+  sc.background=sv0.bg;sc.fog=sv0.fog;carObj.visible=sv0.cvis;carObj.position.copy(sv0.cpos);carObj.rotation.y=sv0.cry;
+  if(skyG){skyG.visible=sv0.skyV;skyG.position.z=sv0.skyZ}if(shadowM)shadowM.visible=sv0.shV;if(plat)plat.visible=sv0.platV;if(fxP)fxP.visible=sv0.fxV;
+  tiles.forEach((t,i)=>t.visible=sv0.tv[i]);gates.forEach((x,i)=>{x.visible=sv0.gv[i][0];x.position.copy(sv0.gv[i][1])});rainDrops.forEach((d,i)=>d.visible=sv0.rd[i]);
+  spec.restore&&spec.restore();
+ }catch(e){}
+ return ok?cv.toDataURL('image/jpeg',.82):null;
+}
+
+// ---- scene setups ----
+const lookGame=()=>{cam.position.set(0,4.4,7);cam.lookAt(0,1.35,-4)};
+function gameBase(){
+ carObj.position.set(0,0,0);carObj.rotation.y=0;
+ if(skyG){skyG.visible=true;skyG.position.z=0}
+ if(shadowM){shadowM.visible=true;shadowM.position.set(0,.035,0);const M=carObj.userData.m;if(M)shadowM.scale.set(M.W*.58,M.L*.56,1)}
+ if(plat)plat.visible=false;
+ const t=curTheme();
+ if(fxP)fxP.visible=!!t.fx2;
+ rainDrops.forEach(d=>d.visible=t.fx==='rain');
+}
+function relook(){applyLook();}
+const SPEC={
+ t(x){return{key:'t_'+x.id+'_'+curRoad().id,apply(){S.theme=x.id;applyLook();gameBase()},camera:lookGame,restore:relook,fov:66}},
+ r(x){return{key:'r_'+x.id+'_'+curTheme().id,apply(){S.road=x.id;applyLook();gameBase();carObj.position.set(0,0,-6);if(shadowM)shadowM.position.z=-6},camera:()=>{cam.position.set(0,2.9,4);cam.lookAt(0,.3,-8)},restore:relook,fov:66}},
+ g(x){return{key:'g_'+x.id,apply(){
+   S.gate=x.id;rebuildGates();gameBase();carObj.visible=false;
+   const lt=['أ','ب','ج'];gates.forEach((q,i)=>{try{label(q,lt[i])}catch(e){}q.position.set((i-1)*3,0,-3);q.visible=true});
+  },camera:()=>{cam.position.set(0,3.0,4);cam.lookAt(0,2.4,-6)},restore(){rebuildGates()},fov:60}},
+ c(x){
+  const sl=(x.desc||'');const front=/^الأمام/.test(sl),side=/^الجانب/.test(sl),rim=x.g==='rm',gl=x.g==='gl';
+  return{key:'c_'+x.id+'_'+S.car+'_'+S.color,apply(){
+   S.eqG='';S.eqR='';S.eqA=[];if(gl)S.eqG=x.id;else if(rim)S.eqR=x.id;else S.eqA=[x.id];
+   const op=pv;pv=null;applyCar();pv=op;
+   tiles.forEach(t=>t.visible=false);if(skyG)skyG.visible=false;if(shadowM)shadowM.visible=false;rainDrops.forEach(d=>d.visible=false);if(fxP)fxP.visible=false;
+   if(plat)plat.visible=true;
+   sc.background=new THREE.Color(0x12304f);sc.fog=null;
+   carObj.position.set(0,0,0);carObj.rotation.y=front?Math.PI+.55:side?1.05:rim?1.25:.6;
+  },camera:()=>{if(rim){cam.position.set(3.2,1.0,3.2);cam.lookAt(.2,.45,.9)}else if(gl){cam.position.set(0,2.0,5.6);cam.lookAt(0,.3,0)}else{cam.position.set(0,2.3,6.0);cam.lookAt(0,1.0,0)}},
+  restore(){const op=pv;pv=null;applyCar();pv=op;applyLook()},fov:44}}
+};
+const KIND=()=>({t:'t',r:'r',g:'g',c:'c'})[shopTab];
+
+// ---- queue ----
+function pump(){
+ if(busy||!Q.length)return;
+ if(!ready()||!idle()||document.hidden){setTimeout(pump,600);return}
+ const j=Q.shift();
+ if(mem[j.key]){fin(j.key,mem[j.key]);return pumpSoon()}
+ busy=1;
+ requestAnimationFrame(()=>{let u=null;try{u=snap(j.spec)}catch(e){}
+  busy=0;if(u){mem[j.key]=u;LSS(j.key,u);fin(j.key,u)}pumpSoon()});
+}
+function pumpSoon(){setTimeout(pump,45)}
+function fin(key,url){const hs=pending[key];delete pending[key];if(hs)hs.forEach(el=>paint(el,url))}
+function paint(el,url){if(!el.isConnected)return;el.classList.remove('pvl');el.innerHTML='<img class="pvi" alt="" src="'+url+'">'}
+function want(el,spec,prio){
+ const k=spec.key;let u=mem[k]||LS(k);
+ if(u){mem[k]=u;paint(el,u);return}
+ el.classList.add('pvl');el.innerHTML='';
+ (pending[k]=pending[k]||[]).push(el);
+ if(!Q.some(j=>j.key===k)){const j={key:k,spec};if(prio)Q.unshift(j);else Q.push(j)}
+ pump();
+}
+
+// ---- decorate the shop ----
+function frameMini(x){
+ const av=(typeof S!=='undefined'&&S.avatarImage)?'<img src="'+S.avatarImage+'" alt="">':(S.avatar||'🦊');
+ return '<div class="pvav" style="box-shadow:'+x.sh+'">'+av+'</div>';
+}
+function decorate(){
+ const el=document.getElementById('worlditems');if(!el)return;
+ const list=shopList(),cards=el.querySelectorAll('.wk-card'),tab=shopTab;
+ cards.forEach((c,i)=>{const x=list[i],pv2=c.querySelector('.wk-pv');if(!x||!pv2)return;
+  if(tab==='f'){pv2.className='wk-pv pvf';pv2.innerHTML=frameMini(x);return}
+  const k=KIND();if(!k)return;
+  pv2.className='wk-pv';pv2.innerHTML='';
+  const isCur=tab==='t'?curTheme().id===x.id:tab==='r'?curRoad().id===x.id:tab==='g'?(S.gate||'neon')===x.id:false;
+  // compute the key without touching the scene
+  let spec;try{spec=SPEC[k](x)}catch(e){return}
+  want(pv2,spec,isCur);
+ });
+}
+const _rs=renderWorldShop;
+renderWorldShop=function(){_rs.apply(this,arguments);try{decorate()}catch(e){}};
+
+// ---- home-screen themes (lobby modal) + buy dialog: show the real thing ----
+function homeMini(card){
+ const pvEl=card.querySelector('.lb-pv');if(!pvEl||pvEl.dataset.m)return;pvEl.dataset.m='1';
+ const bg=pvEl.style.background,home=document.getElementById('home');if(!home)return;
+ const w=pvEl.clientWidth||150,sc0=w/390,hh=Math.round(700*sc0);
+ pvEl.style.cssText='position:relative;width:100%;height:'+hh+'px;overflow:hidden;border-radius:12px;border:2px solid #fff;box-shadow:0 2px 6px #0003;background:'+bg;
+ const inn=document.createElement('div');inn.className='hmini-in';inn.style.cssText='position:absolute;left:0;top:0;width:390px;height:700px;transform-origin:0 0;transform:scale('+sc0+');pointer-events:none';
+ const c=home.cloneNode(true);c.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));c.querySelectorAll('[onclick]').forEach(e=>e.removeAttribute('onclick'));
+ c.removeAttribute('data-lb');c.id='home';c.className='scr on';c.style.cssText='position:absolute!important;inset:0!important;display:flex!important;opacity:1!important;transform:none!important;visibility:visible!important;background:'+bg+'!important;pointer-events:none';
+ inn.appendChild(c);pvEl.innerHTML='';pvEl.appendChild(inn);
+}
+const mo=new MutationObserver(()=>{const g=document.getElementById('lbG');if(g&&!g.__pv){g.__pv=1}if(g)g.querySelectorAll('.lb-card').forEach(c=>{try{homeMini(c)}catch(e){}})});
+mo.observe(document.body,{childList:true,subtree:true});
+// when a lobby card is re-drawn the pv is new, observer handles it
+const _ab=window.askBuy;
+if(typeof _ab==='function')window.askBuy=function(x,ok){try{if(x&&!x.pv&&x.ico&&['🌦️','🛣️','🖼️','🚪'].indexOf(x.ico)>=0){const it=shopList().find(v=>v.n===x.n);if(it){if(shopTab==='f')x.pv='<div class="wk-pv pvf" style="border-radius:14px;height:96px;width:220px;margin:0 auto">'+frameMini(it)+'</div>';else{const k=KIND()&&SPEC[KIND()](it).key,u=k&&mem[k];if(u)x.pv='<img alt="" src="'+u+'" style="width:220px;max-width:100%;border-radius:14px;display:block;margin:0 auto">'}}}}catch(e){0}return _ab.call(this,x,ok)};
+window.__shopPreview={mem,Q,snap:()=>decorate()};
+})();
