@@ -8,27 +8,33 @@
   const sOn=()=>{try{return !!S.set.S}catch(e){return true}};
   const key=u=>{const m=/([0-9a-f-]+)\.mp3$/.exec(u||'');return m?m[1]+'.mp3':null};
 
-  // manifest of clips that really exist, so we never request a missing file
-  fetch(BASE+'manifest.json',{cache:'force-cache'}).then(r=>r.ok?r.json():[]).then(j=>{list=Array.isArray(j)?j:[];kick()}).catch(()=>{});
-
+  // voice clips ship as base64 packs (js/apackN.js). They are fetched after the first tap, then decoded in idle time.
+  const NPACK=7;let packsStarted=false;const raw=Object.create(null);
+  function pack(o){for(const k in o){if(!bufs[k])raw[k]=o[k]}kick()}
+  function loadPacks(){
+    if(packsStarted)return;packsStarted=true;let i=1;
+    const next=()=>{if(i>NPACK)return;const s=document.createElement('script');s.src='js/apack'+(i++)+'.js';s.async=true;s.onload=()=>setTimeout(next,250);s.onerror=()=>setTimeout(next,250);document.head.appendChild(s)};
+    next();
+  }
+  const b64=s=>{const bin=atob(s),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u.buffer};
   // decode a few clips at a time while the browser is idle, only after the audio context exists
   function kick(){
-    if(loading||!list.length)return;
+    if(loading||!Object.keys(raw).length)return;
     if(typeof AC==='undefined'||!AC){setTimeout(kick,800);return}
     loading=true;
-    const todo=list.filter(f=>!bufs[f]);
-    let i=0;
     const next=()=>{
-      if(i>=todo.length){loading=false;return}
-      const f=todo[i++];
-      fetch(BASE+f).then(r=>r.arrayBuffer()).then(ab=>new Promise((ok,no)=>AC.decodeAudioData(ab,ok,no))).then(b=>{bufs[f]=b}).catch(()=>{}).then(()=>{
+      const f=Object.keys(raw)[0];
+      if(!f){loading=false;return}
+      const data=raw[f];delete raw[f];
+      let ab;try{ab=b64(data)}catch(e){return next()}
+      new Promise((ok,no)=>AC.decodeAudioData(ab,ok,no)).then(b=>{bufs[f]=b}).catch(()=>{}).then(()=>{
         (window.requestIdleCallback||setTimeout)(next,{timeout:200})
       });
     };
     next();
   }
-  addEventListener('pointerdown',()=>setTimeout(kick,300),{once:true,passive:true});
-  addEventListener('keydown',()=>setTimeout(kick,300),{once:true});
+  addEventListener('pointerdown',()=>{setTimeout(loadPacks,300);setTimeout(kick,600)},{once:true,passive:true});
+  addEventListener('keydown',()=>{setTimeout(loadPacks,300);setTimeout(kick,600)},{once:true});
 
   function stopVoice(){try{if(src){src.onended=null;src.stop()}}catch(e){}src=null}
   function playBuf(b,done){
@@ -79,7 +85,7 @@
     race(){tone(220,0,.5,{type:'sawtooth',to:660,v:.07});tone(440,.05,.45,{type:'triangle',to:1320,v:.07})},
     win(){[523,659,784,1047].forEach((f,i)=>tone(f,i*.11,.22,{h:2,v:.18}));tone(1319,.5,.5,{h:2,v:.18})}
   };
-  window.TKfx=FX;window.TKaudio={bufs:bufs,playing:()=>!!src};
+  window.TKfx=FX;window.TKaudio={pack:pack,bufs:bufs,playing:()=>!!src};
   const prevBeep=window.beep||beep;
   window.beep=beep=function(f,d,t){
     try{
