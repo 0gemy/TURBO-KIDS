@@ -96,24 +96,25 @@ function rebuild(){const a=$$('ach');if(!a||a.querySelector('.ac-hero'))return;
 })();
 
 
-// ---------- modern home screen: one consistent SVG icon set (replaces emoji icons) ----------
+// ---------- kid-friendly home screen: colorful chunky cartoon SVG icons (replaces emoji icons) ----------
 (function(){
+const O='#1e1b4b';
 const P={
- gem:'<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l-2 6 5 12 5-12-2-6"/>',
- star:'<path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/>',
- medal:'<circle cx="12" cy="9" r="6"/><path d="M8.5 14L7 22l5-3 5 3-1.5-8"/>',
- play:'<path d="M7 4.5v15l13-7.5z" fill="currentColor"/>',
- car:'<path d="M5 17H3v-5l2-5.5A2 2 0 0 1 6.9 5h10.2a2 2 0 0 1 1.9 1.5L21 12v5h-2"/><path d="M3 12h18"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/><path d="M9.5 17h5"/>',
- road:'<path d="M8 3L4 21M16 3l4 18M12 4v3M12 10.5v3M12 17v3"/>',
- globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18"/>',
- pad:'<path d="M6 8h12a4 4 0 0 1 3.9 4.9l-.8 3.6a2.3 2.3 0 0 1-4 1L15 15H9l-2.1 2.5a2.3 2.3 0 0 1-4-1l-.8-3.6A4 4 0 0 1 6 8z"/><path d="M8 10.5v3M6.5 12h3"/><circle cx="15.5" cy="11" r=".7" fill="currentColor"/><circle cx="17.5" cy="13" r=".7" fill="currentColor"/>',
- gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M5 12v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-8"/><path d="M12 8C9 8 7 6.8 7 5.3A2.3 2.3 0 0 1 9.3 3C11 3 12 5 12 8zM12 8c3 0 5-1.2 5-2.7A2.3 2.3 0 0 0 14.7 3C13 3 12 5 12 8z"/>',
- login:'<path d="M15 3h3a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3h-3"/><path d="M10 17l5-5-5-5M15 12H3"/>',
- menu:'<path d="M4 7h16M4 12h16M4 17h10"/>',
- user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
- chev:'<path d="M15 5l-7 7 7 7"/>'
+ gem:'<path d="M14 6h20l9 12-19 24L5 18z" fill="#38bdf8" stroke="'+O+'" stroke-width="3" stroke-linejoin="round"/><path d="M5 18h38M19 6l-4 12 9 24 9-24-4-12" fill="none" stroke="#e0f2fe" stroke-width="2.5" stroke-linejoin="round"/><path d="M15 18l4-12h10l4 12z" fill="#7dd3fc"/>',
+ star:'<path d="M24 4l5.8 12 13.2 1.8-9.6 9.2 2.4 13L24 33.8 12.2 40l2.4-13L5 17.8 18.2 16z" fill="#fbbf24" stroke="#b45309" stroke-width="3" stroke-linejoin="round"/><path d="M24 11l3 6.5M17 19l-5 .5" stroke="#fff7c2" stroke-width="3" stroke-linecap="round"/>',
+ medal:'<path d="M14 24l-5 18 9-4 6 6 4-14zM34 24l5 18-9-4-6 6-4-14z" fill="#ef4444" stroke="'+O+'" stroke-width="2.5" stroke-linejoin="round"/><circle cx="24" cy="18" r="13" fill="#fbbf24" stroke="#b45309" stroke-width="3"/><circle cx="24" cy="18" r="7.5" fill="#fde68a" stroke="#f59e0b" stroke-width="2"/>',
+ play:'<path d="M14 8c0-2.4 2.5-3.8 4.6-2.6l22 13.6c2 1.2 2 4 0 5.2L18.6 37.8C16.5 39 14 37.600 14 35.200z" fill="#fb923c" stroke="#c2410c" stroke-width="3" stroke-linejoin="round" transform="translate(-3 0)"/>',
+ car:'<path d="M5 30v-6l5-11c.6-1.4 2-2.300 3.500-2.300h21c1.500 0 2.900.9 3.500 2.300l5 11v6c0 1.700-1.300 3-3 3H8c-1.700 0-3-1.300-3-3z" fill="#ef4444" stroke="'+O+'" stroke-width="3" stroke-linejoin="round"/><path d="M13 14h22l4 10H9z" fill="#bae6fd" stroke="'+O+'" stroke-width="2.500" stroke-linejoin="round"/><path d="M24 14v10" stroke="'+O+'" stroke-width="2.500"/><circle cx="13" cy="34" r="5.500" fill="#334155" stroke="'+O+'" stroke-width="3"/><circle cx="35" cy="34" r="5.500" fill="#334155" stroke="'+O+'" stroke-width="3"/><circle cx="13" cy="34" r="2" fill="#e2e8f0"/><circle cx="35" cy="34" r="2" fill="#e2e8f0"/><circle cx="8.500" cy="26" r="2.200" fill="#fde047"/><circle cx="39.500" cy="26" r="2.200" fill="#fde047"/>',
+ road:'<path d="M18 5h12l13 38H5z" fill="#475569" stroke="'+O+'" stroke-width="3" stroke-linejoin="round"/><path d="M24 9v6M24 20v7M24 32v9" stroke="#fde047" stroke-width="3.500" stroke-linecap="round"/><path d="M15 43l5-34M33 43L28 9" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7"/>',
+ globe:'<circle cx="24" cy="24" r="19" fill="#38bdf8" stroke="'+O+'" stroke-width="3"/><path d="M12 14c4-3 9-2 10 2s-4 5-3 9-6 3-8 0-3-8 1-11zM28 27c4-2 9 0 9 5s-5 8-8 6-4-9-1-11zM30 9c3 0 6 2 7 4-3 1-6 0-7-1z" fill="#4ade80" stroke="#15803d" stroke-width="1.800" stroke-linejoin="round"/><path d="M13 9c3-2 6-3 9-3" stroke="#fff" stroke-width="2.500" stroke-linecap="round" opacity=".8"/>',
+ pad:'<path d="M13 12h22c5 0 8.500 4 9.300 9.500l1.200 8.500c.5 4-2.500 7-6 6-1.800-.5-3-1.800-4.300-3.300L32 30H16l-2.200 2.700C12.500 34.200 11.300 35.500 9.500 36c-3.500 1-6.500-2-6-6l1.200-8.500C5.500 16 9 12 13 12z" fill="#8b5cf6" stroke="'+O+'" stroke-width="3" stroke-linejoin="round"/><path d="M15 17v8M11 21h8" stroke="#fde047" stroke-width="3.500" stroke-linecap="round"/><circle cx="31" cy="19" r="2.600" fill="#4ade80" stroke="'+O+'" stroke-width="1.500"/><circle cx="36.500" cy="23.500" r="2.600" fill="#f472b6" stroke="'+O+'" stroke-width="1.500"/>',
+ gift:'<rect x="6" y="19" width="36" height="10" rx="3" fill="#f472b6" stroke="'+O+'" stroke-width="3"/><path d="M9 29h30v11c0 1.700-1.300 3-3 3H12c-1.700 0-3-1.300-3-3z" fill="#ef4444" stroke="'+O+'" stroke-width="3" stroke-linejoin="round"/><path d="M24 19v24" stroke="#fde047" stroke-width="5"/><path d="M24 19c-6 0-10-2-10-6a4.500 4.500 0 0 1 8-2.500c1.500 2 2 5 2 8.500zM24 19c6 0 10-2 10-6a4.500 4.500 0 0 0-8-2.500c-1.500 2-2 5-2 8.500z" fill="#fde047" stroke="#b45309" stroke-width="2.500" stroke-linejoin="round"/>',
+ login:'<circle cx="24" cy="24" r="19" fill="#22c55e" stroke="'+O+'" stroke-width="3"/><path d="M12 24h19M23 15l9 9-9 9" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>',
+ menu:'<rect x="6" y="9" width="36" height="8" rx="4" fill="#f472b6" stroke="'+O+'" stroke-width="2.500"/><rect x="6" y="20" width="36" height="8" rx="4" fill="#fbbf24" stroke="'+O+'" stroke-width="2.500"/><rect x="6" y="31" width="24" height="8" rx="4" fill="#2dd4bf" stroke="'+O+'" stroke-width="2.500"/>',
+ user:'<circle cx="24" cy="24" r="19" fill="#fb923c" stroke="'+O+'" stroke-width="3"/><circle cx="24" cy="19" r="7" fill="#fff7ed" stroke="'+O+'" stroke-width="2.500"/><path d="M10.500 38c2-7 7-10 13.500-10s11.500 3 13.500 10" fill="#fff7ed" stroke="'+O+'" stroke-width="2.500" stroke-linejoin="round"/>',
+ chev:'<path d="M30 8L14 24l16 16" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>'
 };
-const svg=(n,c)=>'<svg class="ic'+(c?' '+c:'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P[n]+'</svg>';
+const svg=(n,c)=>'<svg class="ic'+(c?' '+c:'')+'" viewBox="0 0 48 48" aria-hidden="true">'+P[n]+'</svg>';
 window.tkIcon=svg;
 function swap(el,name,cls){if(!el||el.dataset.ic)return;el.dataset.ic=name;el.innerHTML=svg(name,cls)}
 function textIcon(el,name){ // replaces the leading emoji text node
@@ -139,3 +140,4 @@ const ab=document.getElementById('accBtn');if(ab){try{new MutationObserver(()=>{
 try{modern()}catch(e){}
 document.addEventListener('DOMContentLoaded',()=>{try{modern()}catch(e){}});
 })();
+
