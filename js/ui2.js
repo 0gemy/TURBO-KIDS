@@ -55,7 +55,7 @@ const _hud=hud;hud=function(){_hud();try{paintAcc()}catch(e){}};
 try{paintAcc()}catch(e){}
 // ---------- achievements ----------
 const STR=[[10,100],[25,250],[50,500],[100,1000],[150,1500],[200,2000],[250,3000],[300,4000],[336,5000]];
-function strClick(e){const b=e.target.closest('[data-str]');if(!b)return;const N=+b.dataset.str,pr=STR.find(x=>x[0]===N);if(!pr)return;const R=pr[1];S.stR=S.stR||{};if(S.stR[N]||(typeof tot==='function'?tot():0)<N)return;S.stR[N]=1;S.coins=(S.coins|0)+R;sv();hud();cel('🎁 +'+R+' عملة',1600,1);rprog()}
+function strClick(e){const b=e.target.closest('[data-str]');if(!b)return;const N=+b.dataset.str,pr=STR.find(x=>x[0]===N);if(!pr)return;const R=pr[1];S.stR=S.stR||{};if(S.stR[N]||Object.values(S.stars||{}).reduce((x,y)=>x+y,0)<N)return;S.stR[N]=1;S.coins=(S.coins|0)+R;sv();hud();cel('🎁 +'+R+' عملة',1600,1);rprog()}
 const LVR=[[5,100],[10,250],[20,500],[30,750],[40,1000],[50,1500],[60,2000],[70,2500],[80,3000],[90,4000],[100,5000]];
 function lvrClick(e){const b=e.target.closest('[data-lvr]');if(!b)return;const L=+b.dataset.lvr,pair=LVR.find(x=>x[0]===L);if(!pair)return;const R=pair[1];
  S.lvR=S.lvR||{};if(S.lvR[L])return;S.lvR[L]=1;S.coins=(S.coins|0)+R;sv();hud();cel('🎁 +'+R+' عملة',1600,1);rprog()}
@@ -75,7 +75,7 @@ function rebuild(){const a=$$('ach');if(!a||a.querySelector('.ac-hero'))return;
   if(done&&!claimed){btn=mk('button','ach-claim','🎁 '+R);btn.setAttribute('data-lvr',L)}
   items.push({ic:'🏅',t:'مستوى '+L,d:'اوصل للمستوى '+L+' واستلم '+R+' عملة',p:Math.min(100,Math.round(100*lvl/L)),btn,sm:Math.min(lvl,L)+'/'+L,done,claimed:done&&claimed})});
  // star milestone achievements: total stars across all stages, coin prizes grow 100 -> 5000
- const stt=(typeof tot==='function'?tot():0);S.stR=S.stR||{};
+ const stt=Object.values(S.stars||{}).reduce((x,y)=>x+y,0);S.stR=S.stR||{};
  STR.forEach(pair=>{const N=pair[0],R=pair[1];const done=stt>=N,claimed=!!S.stR[N];let btn=null;
   if(done&&!claimed){btn=mk('button','ach-claim','🎁 '+R);btn.setAttribute('data-str',N)}
   items.push({ic:'⭐',t:N+' نجمة',d:'اجمع '+N+' نجمة واستلم '+R+' عملة',p:Math.min(100,Math.round(100*stt/N)),btn,sm:Math.min(stt,N)+'/'+N,done,claimed:done&&claimed})});
