@@ -8,34 +8,46 @@
   const sOn=()=>{try{return !!S.set.S}catch(e){return true}};
   const key=u=>{const m=/([0-9a-f-]+)\.mp3$/.exec(u||'');return m?m[1]+'.mp3':null};
 
-  // voice clips ship as base64 packs (js/apackN.js). They are fetched after the first tap, then decoded in idle time.
-  const NPACK=18;let packsStarted=false;const raw=Object.create(null);
+  // Voice clips ship as base64 packs (js/apackN.js), requested in parallel shortly after load.
+  // Clips are decoded one at a time in idle time, or on demand (off the main thread) when a clip is needed first.
+  const NPACK=18;let packsStarted=false,packsDone=0;const raw=Object.create(null),pend=Object.create(null);
   function pack(o){for(const k in o){if(!bufs[k])raw[k]=o[k]}kick()}
   function loadPacks(){
-    if(packsStarted)return;packsStarted=true;let i=1;
-    const next=()=>{if(i>NPACK)return;const s=document.createElement('script');s.src='js/apack'+(i++)+'.js';s.async=true;s.onload=()=>setTimeout(next,250);s.onerror=()=>setTimeout(next,250);document.head.appendChild(s)};
-    next();
+    if(packsStarted)return;packsStarted=true;
+    for(let i=1;i<=NPACK;i++){const s=document.createElement('script');s.src='js/apack'+i+'.js';s.async=true;s.onload=s.onerror=()=>{packsDone++};document.head.appendChild(s)}
   }
   const b64=s=>{const bin=atob(s),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u.buffer};
-  // decode a few clips at a time while the browser is idle, only after the audio context exists
+  function ensure(f){
+    if(bufs[f])return Promise.resolve(bufs[f]);
+    if(pend[f])return pend[f];
+    const d=raw[f];if(!d||typeof AC==='undefined'||!AC)return Promise.resolve(null);
+    delete raw[f];
+    return pend[f]=new Promise((ok,no)=>AC.decodeAudioData(b64(d),ok,no)).then(b=>{bufs[f]=b;delete pend[f];return b}).catch(()=>{delete pend[f];return null});
+  }
   function kick(){
     if(loading||!Object.keys(raw).length)return;
     if(typeof AC==='undefined'||!AC){setTimeout(kick,800);return}
     loading=true;
-    const next=()=>{
-      const f=Object.keys(raw)[0];
-      if(!f){loading=false;return}
-      const data=raw[f];delete raw[f];
-      let ab;try{ab=b64(data)}catch(e){return next()}
-      new Promise((ok,no)=>AC.decodeAudioData(ab,ok,no)).then(b=>{bufs[f]=b}).catch(()=>{}).then(()=>{
-        (window.requestIdleCallback||setTimeout)(next,{timeout:200})
-      });
-    };
+    const next=()=>{const f=Object.keys(raw)[0];if(!f){loading=false;return}ensure(f).then(()=>(window.requestIdleCallback||setTimeout)(next,{timeout:300}))};
     next();
   }
-  setTimeout(loadPacks,4000);
-  addEventListener('pointerdown',()=>{setTimeout(loadPacks,300);setTimeout(kick,600)},{once:true,passive:true});
-  addEventListener('keydown',()=>{setTimeout(loadPacks,300);setTimeout(kick,600)},{once:true});
+  // wait (briefly) for a clip that is still arriving/decoding, instead of falling back to the slow phone voice
+  function getClip(f,ms){
+    return new Promise(res=>{
+      const t0=performance.now();
+      const step=()=>{
+        if(bufs[f])return res(bufs[f]);
+        if(raw[f]||pend[f])return ensure(f).then(res);
+        if(packsDone>=NPACK||performance.now()-t0>ms)return res(null);
+        setTimeout(step,80);
+      };
+      step();
+    });
+  }
+  try{ac.w=1}catch(e){}   // skip the silent speechSynthesis warm-up utterance (it initialises the phone TTS engine and stalls)
+  setTimeout(loadPacks,1500);
+  addEventListener('pointerdown',()=>{loadPacks();setTimeout(kick,300)},{once:true,passive:true});
+  addEventListener('keydown',()=>{loadPacks();setTimeout(kick,300)},{once:true});
 
   function stopVoice(){try{if(src){src.onended=null;src.stop()}}catch(e){}src=null}
   function playBuf(b,done){
@@ -46,34 +58,47 @@
     src=s;s.start();return s;
   }
 
+  const hxs=t=>[...String(t)].map(c=>c.codePointAt(0).toString(16)).join('-');
   const prevSay=window.say||say;
+  const prevTts=(typeof tts==='function')?tts:null;
+  function speakClip(f,my,onFail){
+    getClip(f,1800).then(b=>{
+      if(my!==gen)return;
+      if(!b||!AC){onFail&&onFail();return}
+      if(AC.state==='suspended')AC.resume();
+      busy=true;
+      playBuf(b,()=>{if(my!==gen)return;
+        setTimeout(()=>{if(my!==gen||(typeof paused!=='undefined'&&paused)){busy=false;return}
+          playBuf(b,()=>{if(my===gen)busy=false})},650)});
+      setTimeout(()=>{if(my===gen)busy=false},9000);
+    });
+  }
+  function stopOld(){
+    try{const ss=window.speechSynthesis;if(ss&&(ss.speaking||ss.pending))ss.cancel()}catch(e){}
+    try{if(typeof cur0!=='undefined'&&cur0){cur0.pause();cur0=null}}catch(e){}
+  }
   window.say=say=function(q){
     try{
-      const hx=t=>[...String(t)].map(c=>c.codePointAt(0).toString(16)).join('-');
-      const f=q&&(q.lang==='en'&&q.sp?'en-'+hx(q.sp)+'.mp3':key(q.a));
-      if(f&&bufs[f]&&AC&&S.set.L){
-        if(AC.state==='suspended')AC.resume();
-        try{speechSynthesis.cancel()}catch(e){}
-        if(typeof cur0!=='undefined'&&cur0){try{cur0.pause()}catch(e){}cur0=null}
-        const my=++gen;busy=true;
-        const b=bufs[f];
-        playBuf(b,()=>{if(my!==gen)return;
-          // one gentle repeat, like the old behaviour, unless something newer started
-          setTimeout(()=>{if(my!==gen||(typeof paused!=='undefined'&&paused)){busy=false;return}
-            playBuf(b,()=>{if(my===gen)busy=false})},650)});
-        setTimeout(()=>{if(my===gen)busy=false},9000);
+      const f=q&&(q.lang==='en'&&q.sp?'en-'+hxs(q.sp)+'.mp3':key(q.a));
+      if(f&&AC&&S.set.L){
+        const my=++gen;stopOld();stopVoice();busy=true;
+        speakClip(f,my,()=>{if(my===gen){gen++;prevSay.call(null,q)}});
         return;
       }
     }catch(e){}
     return prevSay.apply(this,arguments);
   };
-
-
   // praise / retry phrases: recorded clip when available, otherwise the old phone voice
-  try{if(typeof tts==='function'){const pt=tts;window.tts=tts=function(t,lg){
-    try{const f='p-'+[...String(t)].map(c=>c.codePointAt(0).toString(16)).join('-')+'.mp3';
-      if(bufs[f]&&AC&&S.set.L){if(AC.state==='suspended')AC.resume();try{speechSynthesis.cancel()}catch(e){}playBuf(bufs[f]);return}}catch(e){}
-    return pt.apply(this,arguments)}}}catch(e){}
+  if(prevTts){window.tts=tts=function(t,lg){
+    try{
+      const f='p-'+hxs(t)+'.mp3';
+      if(AC&&S.set.L&&(bufs[f]||raw[f]||pend[f]||packsDone<NPACK)){
+        const my=++gen;stopOld();stopVoice();
+        getClip(f,1200).then(b=>{if(my!==gen)return;if(b){if(AC.state==='suspended')AC.resume();playBuf(b)}else prevTts(t,lg)});
+        return;
+      }
+    }catch(e){}
+    return prevTts.apply(this,arguments)}}
 
   // ---- sound effects (synthesized, small, no files) ----
   function env(o,g,t,a,d,pk){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.0002,pk),t+a);g.gain.exponentialRampToValueAtTime(.0001,t+d)}
