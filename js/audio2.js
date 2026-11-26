@@ -88,17 +88,63 @@
     }catch(e){}
     return prevSay.apply(this,arguments);
   };
-  // praise / retry phrases: recorded clip when available, otherwise the old phone voice
+  // All other spoken text (mini-games, praise, retries): recorded clip when available, otherwise the old phone voice.
+  // Mini-game clips (js/apack19+) are fetched lazily: when the games list opens, or the first time one is needed.
+  const NMG=12;let mgStarted=false,mgDone=0;
+  function loadMg(){
+    if(mgStarted||!NMG)return;mgStarted=true;
+    for(let i=0;i<NMG;i++){const s=document.createElement('script');s.src='js/apack'+(19+i)+'.js';s.async=true;s.onload=s.onerror=()=>{mgDone++};document.head.appendChild(s)}
+  }
+  const AR_NUM={'1':'واحد','2':'اثنان','3':'ثلاثة','4':'أربعة','5':'خمسة','6':'ستة','7':'سبعة','8':'ثمانية','9':'تسعة','10':'عشرة'};
+  const EN_NUM={'1':'one','2':'two','3':'three','4':'four','5':'five','6':'six','7':'seven','8':'eight','9':'nine','10':'ten'};
+  function cands(t,lg){
+    const s=String(t==null?'':t).trim(),en=lg==='en'||/^[\x00-\x7f]+$/.test(s),o=[];
+    if(!s)return o;
+    o.push('p-'+hxs(s)+'.mp3');
+    const bare=s.replace(/[!.\u061f?\u060c,]+$/,'');
+    if(bare!==s){o.push('p-'+hxs(bare)+'.mp3')}
+    o.push('p-'+hxs(bare+'!')+'.mp3');
+    if(en){
+      const l=bare.toLowerCase();
+      if(/^[a-z]$/i.test(bare))o.push('enl-'+hxs(bare.toUpperCase())+'.mp3');
+      const w=EN_NUM[bare]||l;
+      o.push('en-'+hxs(w)+'.mp3');
+    }else{
+      const w=AR_NUM[bare]||bare;
+      if(w!==bare)o.push('p-'+hxs(w)+'.mp3');
+      o.push(hxs(w)+'.mp3');
+      if([...bare].length===1)o.push(hxs(bare+'\u064e')+'.mp3');
+    }
+    return o;
+  }
+  const have=f=>bufs[f]||raw[f]||pend[f];
+  function findClip(cs,ms){
+    return new Promise(res=>{
+      const t0=performance.now();
+      const step=()=>{
+        const f=cs.find(have);
+        if(f)return ensure(f).then(b=>res(b));
+        const done=packsDone>=NPACK&&(!NMG||(mgStarted&&mgDone>=NMG));
+        if(done||performance.now()-t0>ms)return res(null);
+        setTimeout(step,80);
+      };
+      step();
+    });
+  }
   if(prevTts){window.tts=tts=function(t,lg){
     try{
-      const f='p-'+hxs(t)+'.mp3';
-      if(AC&&S.set.L&&(bufs[f]||raw[f]||pend[f]||packsDone<NPACK)){
-        const my=++gen;stopOld();stopVoice();
-        getClip(f,1200).then(b=>{if(my!==gen)return;if(b){if(AC.state==='suspended')AC.resume();playBuf(b)}else prevTts(t,lg)});
-        return;
+      if(AC&&S.set.L){
+        const cs=cands(t,lg);
+        if(cs.length){
+          if(!cs.some(have))loadMg();
+          const my=++gen;stopOld();stopVoice();
+          findClip(cs,2200).then(b=>{if(my!==gen)return;if(b){if(AC.state==='suspended')AC.resume();playBuf(b)}else prevTts(t,lg)});
+          return;
+        }
       }
     }catch(e){}
     return prevTts.apply(this,arguments)}}
+  try{const r0=window.rgm;if(typeof r0==='function'){window.rgm=rgm=function(){try{loadMg()}catch(e){}return r0.apply(this,arguments)}}}catch(e){}
 
   // ---- sound effects (synthesized, small, no files) ----
   function env(o,g,t,a,d,pk){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.0002,pk),t+a);g.gain.exponentialRampToValueAtTime(.0001,t+d)}
