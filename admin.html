@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>TURBO KIDS Admin</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Cairo,system-ui,sans-serif;background:#0f1e36;color:#eaf2ff;padding:14px}
+h1{margin:0 0 4px;font-size:22px}small,.mut{color:#9bb0d0}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
+input,button{font:inherit;border-radius:10px;border:1px solid #2c4468;background:#16294a;color:#fff;padding:8px 12px}
+button{cursor:pointer;background:#2a6df4;border:0}button.g{background:#1f9d55}button.r{background:#d64545}button.s{background:#34486b}
+.stats{display:flex;gap:10px;flex-wrap:wrap}.st{background:#16294a;border-radius:12px;padding:8px 14px}.st b{display:block;font-size:20px}
+table{width:100%;border-collapse:collapse;margin-top:10px;background:#13233f;border-radius:12px;overflow:hidden}
+th,td{padding:9px 8px;text-align:right;border-bottom:1px solid #223a5e;font-size:14px;white-space:nowrap}th{background:#1a2f54;color:#9bb0d0;cursor:pointer}
+.wrap{overflow-x:auto}.act button{margin:2px;padding:5px 9px;font-size:13px}
+.me{color:#ffd34d}.msg{padding:30px;text-align:center}
+.ov{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;padding:16px}
+.bx{background:#16294a;border-radius:16px;padding:18px;max-width:380px;width:100%}.bx input{width:100%;margin:6px 0}
+</style></head><body>
+<h1>🏎️ TURBO KIDS · لوحة التحكم</h1><small id="who"></small>
+<div id="app"><div class="msg">...جاري التحميل</div></div>
+<script>
+(function(){
+const U='https://xeaaupzfmpydcdsepneq.supabase.co',KEY='sb_publishable_5aEyfa5IylaUxdnp62OD_w_UGasTs9P';
+const $=id=>document.getElementById(id),app=$('app');
+const E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+let G=null;try{G=JSON.parse(localStorage.getItem('tk_g')||'null')}catch(e){}
+const hd=t=>({apikey:KEY,Authorization:'Bearer '+t,'Content-Type':'application/json'});
+function msg(h){app.innerHTML='<div class="msg">'+h+'</div>'}
+async function tok(){if(!G)return null;if(G.exp-Date.now()>6e4)return G.at;
+ const r=await fetch(U+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:hd(KEY),body:JSON.stringify({refresh_token:G.rt})});const j=await r.json();
+ if(!j.access_token)return null;G=Object.assign({},G,{at:j.access_token,rt:j.refresh_token||G.rt,exp:Date.now()+(j.expires_in||3600)*1e3});localStorage.setItem('tk_g',JSON.stringify(G));return G.at}
+async function api(path,opt){const t=await tok();if(!t)throw new Error('auth');const r=await fetch(U+path,Object.assign({headers:hd(t)},opt));if(!r.ok){let m='';try{m=(await r.json()).message}catch(e){}throw new Error(m||r.status)}const x=await r.text();return x?JSON.parse(x):null}
+const lvOf=x=>Math.floor((1+Math.sqrt(1+x/12.5))/2);
+let rows=[],sortK='updated_at',dir=-1,q='';
+async function init(){
+ if(!G){msg('لازم تسجّل دخول بحساب Google من اللعبة الأول.<br><br><a href="/" style="color:#7fb0ff">افتح اللعبة وسجّل الدخول</a> وبعدين ارجع هنا.');return}
+ let ok=false;try{ok=await api('/rest/v1/rpc/is_admin',{method:'POST',body:'{}'})}catch(e){}
+ if(ok!==true){msg('⛔ الصفحة دي للمالك فقط.');return}
+ $('who').textContent=G.email;load()}
+async function load(){
+ try{rows=await api('/rest/v1/players?select=id,email,updated_at,coins:data->>coins,xp:data->>xp,name:data->>name,races:data->>races,cars:data->cars,stars:data->stars&limit=1000')}catch(e){msg('تعذر التحميل: '+E(e.message));return}
+ rows.forEach(r=>{r.coins=+r.coins||0;r.xp=+r.xp||0;r.lv=lvOf(r.xp);r.nc=Array.isArray(r.cars)?r.cars.length:0;r.ns=r.stars&&typeof r.stars==='object'?Object.values(r.stars).reduce((a,b)=>a+(+b||0),0):0});draw()}
+function fmt(d){if(!d)return'-';const t=new Date(d);return t.toLocaleString('ar-EG',{dateStyle:'short',timeStyle:'short'})}
+function draw(){
+ const L=rows.filter(r=>!q||((r.email||'')+' '+(r.name||'')).toLowerCase().includes(q)).sort((a,b)=>{const x=a[sortK],y=b[sortK];return (x>y?1:x<y?-1:0)*dir});
+ const tc=rows.reduce((a,r)=>a+r.coins,0);
+ app.innerHTML='<div class="bar"><input id="q" placeholder="بحث بالإيميل أو الاسم" value="'+E(q)+'"><button class="s" id="rf">🔄 تحديث</button></div>'+
+ '<div class="stats"><div class="st">اللاعبين<b>'+rows.length+'</b></div><div class="st">مجموع العملات<b>'+tc.toLocaleString('en')+'</b></div></div>'+
+ '<div class="wrap"><table><tr><th data-k="email">الإيميل</th><th data-k="name">الاسم</th><th data-k="coins">العملات</th><th data-k="lv">المستوى</th><th data-k="xp">XP</th><th data-k="nc">السيارات</th><th data-k="races">السباقات</th><th data-k="updated_at">آخر نشاط</th><th>إجراءات</th></tr>'+
+ L.map(r=>'<tr><td'+(G&&r.id===G.id?' class="me"':'')+'>'+E(r.email)+'</td><td>'+E(r.name||'-')+'</td><td>'+r.coins.toLocaleString('en')+'</td><td>'+r.lv+'</td><td>'+r.xp+'</td><td>'+r.nc+'</td><td>'+E(r.races||0)+'</td><td>'+fmt(r.updated_at)+'</td><td class="act"><button class="g" data-a="add" data-i="'+r.id+'">+ عملات</button><button data-a="edit" data-i="'+r.id+'">تعديل</button>'+(G&&r.id===G.id?'':'<button class="r" data-a="del" data-i="'+r.id+'">حذف</button>')+'</td></tr>').join('')+'</table></div>';
+ $('q').oninput=e=>{q=e.target.value.toLowerCase();const p=e.target.selectionStart;draw();const n=$('q');n.focus();n.setSelectionRange(p,p)};
+ $('rf').onclick=load;
+ app.querySelectorAll('th[data-k]').forEach(h=>h.onclick=()=>{const k=h.dataset.k;if(sortK===k)dir=-dir;else{sortK=k;dir=-1}draw()});
+ app.querySelectorAll('button[data-a]').forEach(b=>b.onclick=()=>act(b.dataset.a,rows.find(r=>r.id===b.dataset.i)))}
+function box(h){const o=document.createElement('div');o.className='ov';o.innerHTML='<div class="bx">'+h+'<div id="bm" class="mut" style="margin-top:6px"></div></div>';document.body.appendChild(o);o.onclick=e=>{if(e.target===o)o.remove()};return o}
+async function op(id,o,box_){const m=box_.querySelector('#bm');m.textContent='...';try{await api('/rest/v1/rpc/admin_op',{method:'POST',body:JSON.stringify({uid:id,op:o})});box_.remove();await load()}catch(e){m.textContent='فشل: '+e.message}}
+function act(a,r){if(!r)return;
+ if(a==='add'){const o=box('<b>إضافة عملات</b><div class="mut">'+E(r.email)+'</div><input id="n" type="number" inputmode="numeric" placeholder="العدد (سالب للخصم)"><button class="g" id="ok">إضافة</button> <button class="s" id="no">إلغاء</button>');
+  o.querySelector('#no').onclick=()=>o.remove();o.querySelector('#ok').onclick=()=>{const n=Math.trunc(+o.querySelector('#n').value);if(!n)return;op(r.id,{t:'add',k:'coins',n},o)}}
+ if(a==='edit'){const o=box('<b>تعديل اللاعب</b><div class="mut">'+E(r.email)+'</div>العملات<input id="c" type="number" value="'+r.coins+'">XP (المستوى الحالي '+r.lv+')<input id="x" type="number" value="'+r.xp+'"><button id="ok">حفظ</button> <button class="s" id="no">إلغاء</button>');
+  o.querySelector('#no').onclick=()=>o.remove();o.querySelector('#ok').onclick=async()=>{const c=Math.max(0,Math.trunc(+o.querySelector('#c').value)),x=Math.max(0,Math.trunc(+o.querySelector('#x').value));
+   if(c!==r.coins)await op0(r.id,{t:'set',k:'coins',n:c},o);if(x!==r.xp)await op0(r.id,{t:'set',k:'xp',n:x},o);o.remove();load()}}
+ if(a==='del'){const o=box('<b style="color:#ff8a8a">حذف الحساب نهائيًا</b><p>هيتحذف حساب <b>'+E(r.email)+'</b> وكل تقدّمه ومش هيتسترجع.</p>اكتب الإيميل للتأكيد<input id="t" placeholder="'+E(r.email)+'" autocomplete="off"><button class="r" id="ok" disabled>حذف نهائي</button> <button class="s" id="no">إلغاء</button>');
+  const ok=o.querySelector('#ok');o.querySelector('#t').oninput=e=>{ok.disabled=e.target.value.trim().toLowerCase()!==String(r.email).toLowerCase()};
+  o.querySelector('#no').onclick=()=>o.remove();ok.onclick=async()=>{o.querySelector('#bm').textContent='...';try{await api('/rest/v1/rpc/admin_delete',{method:'POST',body:JSON.stringify({uid:r.id})});o.remove();load()}catch(e){o.querySelector('#bm').textContent='فشل: '+e.message}}}}
+async function op0(id,o,b){try{await api('/rest/v1/rpc/admin_op',{method:'POST',body:JSON.stringify({uid:id,op:o})})}catch(e){b.querySelector('#bm').textContent='فشل: '+e.message}}
+init();
+})();
+</script></body></html>
