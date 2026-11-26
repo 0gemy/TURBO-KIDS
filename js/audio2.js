@@ -9,7 +9,7 @@
   const key=u=>{const m=/([0-9a-f-]+)\.mp3$/.exec(u||'');return m?m[1]+'.mp3':null};
 
   // voice clips ship as base64 packs (js/apackN.js). They are fetched after the first tap, then decoded in idle time.
-  const NPACK=7;let packsStarted=false;const raw=Object.create(null);
+  const NPACK=17;let packsStarted=false;const raw=Object.create(null);
   function pack(o){for(const k in o){if(!bufs[k])raw[k]=o[k]}kick()}
   function loadPacks(){
     if(packsStarted)return;packsStarted=true;let i=1;
@@ -33,6 +33,7 @@
     };
     next();
   }
+  setTimeout(loadPacks,4000);
   addEventListener('pointerdown',()=>{setTimeout(loadPacks,300);setTimeout(kick,600)},{once:true,passive:true});
   addEventListener('keydown',()=>{setTimeout(loadPacks,300);setTimeout(kick,600)},{once:true});
 
@@ -48,7 +49,8 @@
   const prevSay=window.say||say;
   window.say=say=function(q){
     try{
-      const f=q&&key(q.a);
+      const hx=t=>[...String(t)].map(c=>c.codePointAt(0).toString(16)).join('-');
+      const f=q&&(q.lang==='en'&&q.sp?'en-'+hx(q.sp)+'.mp3':key(q.a));
       if(f&&bufs[f]&&AC&&S.set.L){
         if(AC.state==='suspended')AC.resume();
         try{speechSynthesis.cancel()}catch(e){}
@@ -65,6 +67,13 @@
     }catch(e){}
     return prevSay.apply(this,arguments);
   };
+
+
+  // praise / retry phrases: recorded clip when available, otherwise the old phone voice
+  try{if(typeof tts==='function'){const pt=tts;window.tts=tts=function(t,lg){
+    try{const f='p-'+[...String(t)].map(c=>c.codePointAt(0).toString(16)).join('-')+'.mp3';
+      if(bufs[f]&&AC&&S.set.L){if(AC.state==='suspended')AC.resume();try{speechSynthesis.cancel()}catch(e){}playBuf(bufs[f]);return}}catch(e){}
+    return pt.apply(this,arguments)}}}catch(e){}
 
   // ---- sound effects (synthesized, small, no files) ----
   function env(o,g,t,a,d,pk){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.0002,pk),t+a);g.gain.exponentialRampToValueAtTime(.0001,t+d)}
