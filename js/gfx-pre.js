@@ -3,15 +3,17 @@
 (function(){
   if(!window.THREE)return;
   const WR=THREE.WebGLRenderer;
-  // quality tier: low = weak phones, mid = any touch phone/tablet, high = desktop
-  const weak=!!((navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=4));
-  const touch=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches)||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
-  let forced=null;try{const q=JSON.parse(localStorage.getItem('tk1')||'{}').lq;if(q===1)forced='low';else if(q===0)forced=touch?'mid':'high'}catch(e){}
-  const qt=(location.search.match(/[?&]tier=(low|mid|high)/)||[])[1];window.__gfxTier=qt||forced||(weak?'low':touch?'mid':'high');
+  // Quality tier. Rich graphics only on desktop ("high"). Every phone/tablet/weak device gets the light path,
+  // which renders like the original game (no antialias, no tone mapping, pixel ratio capped).
+  const weak=!!((navigator.deviceMemory&&navigator.deviceMemory<=4)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=4));
+  const touch=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches)||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Mac/.test(navigator.platform));
+  const qt=(location.search.match(/[?&]tier=(low|high)/)||[])[1];
+  window.__gfxTier=qt||((weak||touch)?'low':'high');
   function Wrapped(p){
-    p=Object.assign({},p||{});p.antialias=(window.__gfxTier==='high');
+    p=Object.assign({},p||{});if(window.__gfxTier==='high')p.antialias=true;
     const r=new WR(p);
-    try{r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=.95}catch(e){}
+    if(window.__gfxTier==='high'){try{r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=.95}catch(e){}}
+    else{const spr=r.setPixelRatio.bind(r);r.setPixelRatio=function(v){return spr(Math.min(v,1.25))}}
     return r;
   }
   Wrapped.prototype=WR.prototype;
