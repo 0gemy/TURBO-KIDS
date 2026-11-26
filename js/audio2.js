@@ -9,7 +9,7 @@
   const key=u=>{const m=/([0-9a-f-]+)\.mp3$/.exec(u||'');return m?m[1]+'.mp3':null};
 
   // voice clips ship as base64 packs (js/apackN.js). They are fetched after the first tap, then decoded in idle time.
-  const NPACK=17;let packsStarted=false;const raw=Object.create(null);
+  const NPACK=18;let packsStarted=false;const raw=Object.create(null);
   function pack(o){for(const k in o){if(!bufs[k])raw[k]=o[k]}kick()}
   function loadPacks(){
     if(packsStarted)return;packsStarted=true;let i=1;
