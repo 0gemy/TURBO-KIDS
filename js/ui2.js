@@ -59,6 +59,9 @@ function strClick(e){const b=e.target.closest('[data-str]');if(!b)return;const N
 const LVR=[[5,100],[10,250],[20,500],[30,750],[40,1000],[50,1500],[60,2000],[70,2500],[80,3000],[90,4000],[100,5000]];
 function lvrClick(e){const b=e.target.closest('[data-lvr]');if(!b)return;const L=+b.dataset.lvr,pair=LVR.find(x=>x[0]===L);if(!pair)return;const R=pair[1];
  S.lvR=S.lvR||{};if(S.lvR[L])return;S.lvR[L]=1;S.coins=(S.coins|0)+R;sv();hud();cel('🎁 +'+R+' عملة',1600,1);rprog()}
+const ALB=[[10,100],[20,250],[30,500],[40,1000],[50,2500],[56,10000]];
+function albCount(){try{return LV.filter(l=>S.claimed&&S.claimed[l.id]).length}catch(e){return 0}}
+function albClick(e){const b=e.target.closest('[data-albm]');if(!b)return;const N=+b.dataset.albm,pr=ALB.find(x=>x[0]===N);if(!pr)return;const R=pr[1];S.albR=S.albR||{};if(S.albR[N]||albCount()<N)return;S.albR[N]=1;S.coins=(S.coins|0)+R;sv();hud();cel('🎁 +'+R+' عملة',1600,1);rprog()}
 let flt='all';
 const _rp=rprog;
 rprog=function(){_rp();try{rebuild()}catch(e){console.warn('ach ui',e)}};
@@ -81,8 +84,19 @@ function rebuild(){const a=$$('ach');if(!a||a.querySelector('.ac-hero'))return;
   items.push({ic:'⭐',t:N+' نجمة',d:'اجمع '+N+' نجمة واستلم '+R+' عملة',p:Math.min(100,Math.round(100*stt/N)),btn,sm:Math.min(stt,N)+'/'+N,done,claimed:done&&claimed})});
  if(!a._str){a._str=1;a.addEventListener('click',strClick)}
  if(!a._lvr){a._lvr=1;a.addEventListener('click',lvrClick)}
+ // album sticker milestones: one sticker per completed album stage (LV), prizes grow 100 -> 10000
+ const alc=albCount();S.albR=S.albR||{};
+ ALB.forEach(pair=>{const N=pair[0],R=pair[1];const done=alc>=N,claimed=!!S.albR[N];let btn=null;
+  if(done&&!claimed){btn=mk('button','ach-claim','🎁 '+R);btn.setAttribute('data-albm',N)}
+  const full=N===56;
+  items.push({ic:'📒',t:full?'كل الألبوم':N+' ملصق',d:(full?'كمّل ألبوم الملصقات كله ('+N+' ملصق)':'اجمع '+N+' ملصق في الألبوم')+' واستلم '+R+' عملة',p:Math.min(100,Math.round(100*alc/N)),btn,sm:Math.min(alc,N)+'/'+N,done,claimed:done&&claimed})});
+ if(!a._albm){a._albm=1;a.addEventListener('click',albClick)}
+ if(!a._allb){a._allb=1;a.addEventListener('click',e=>{const b=e.target.closest('[data-allb]');if(!b)return;e.stopPropagation();e.preventDefault();if(S.achAll)return;S.achAll=1;S.coins=(S.coins|0)+15000;sv();hud();cel('🏆 مبروك! +15000 عملة',2200,1);rprog()},true)}
  const tl=[...stats.children].map(c=>({i:c.children[0].textContent,v:c.children[1].textContent,l:c.children[2].textContent}));
  const nDone=items.filter(i=>i.done).length,tot=items.length,pc=Math.round(100*nDone/tot),nClaim=items.filter(i=>i.btn).length;
+ // all-achievements bonus: 15000 coins; counts base + level + star + album achievements
+ if(bonus){const allDone=items.every(i=>i.done);
+  bonus.innerHTML=S.achAll?'🏆 استلمت جائزة إنهاء كل الإنجازات (15000 💎)':allDone?'<button class="ach-claim big" data-allb="1">🏆 استلم 15000 💎 لإنهاء كل الإنجازات</button>':'🏆 أنهِ كل الإنجازات ('+nDone+'/'+tot+') واحصل على 15000 💎'}
  const hero=mk('div','ac-hero','<div class="ac-ring" style="--p:'+pc+'"><div>'+nDone+'/'+tot+'<small>إنجاز</small></div></div><div><h3>🏆 إنجازاتك</h3><p>'+(nClaim?'عندك '+nClaim+' جائزة تستنى تستلمها 🎁':nDone===tot?'خلّصت كل الإنجازات! 👑':'باقي '+(tot-nDone)+' إنجاز وتكمّل كلهم')+'</p></div>');
  const st=mk('div','ac-stats',tl.map(t=>'<div><i>'+t.i+'</i><b>'+t.v+'</b><span>'+t.l+'</span></div>').join(''));
  const tabs=mk('div','ac-tabs','<button data-f="all">الكل</button><button data-f="go">قيد التنفيذ</button><button data-f="ok">مكتملة</button>');
@@ -153,4 +167,5 @@ const ab=document.getElementById('accBtn');if(ab){try{new MutationObserver(()=>{
 try{modern()}catch(e){}
 document.addEventListener('DOMContentLoaded',()=>{try{modern()}catch(e){}});
 })();
+
 
