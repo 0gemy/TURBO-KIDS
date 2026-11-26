@@ -94,3 +94,44 @@ function rebuild(){const a=$$('ach');if(!a||a.querySelector('.ac-hero'))return;
  if(bonus)a.appendChild(bonus);
 }
 })();
+
+
+// ---------- modern home screen: one consistent SVG icon set (replaces emoji icons) ----------
+(function(){
+const P={
+ gem:'<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l-2 6 5 12 5-12-2-6"/>',
+ star:'<path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/>',
+ medal:'<circle cx="12" cy="9" r="6"/><path d="M8.5 14L7 22l5-3 5 3-1.5-8"/>',
+ play:'<path d="M7 4.5v15l13-7.5z" fill="currentColor"/>',
+ car:'<path d="M5 17H3v-5l2-5.5A2 2 0 0 1 6.9 5h10.2a2 2 0 0 1 1.9 1.5L21 12v5h-2"/><path d="M3 12h18"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/><path d="M9.5 17h5"/>',
+ road:'<path d="M8 3L4 21M16 3l4 18M12 4v3M12 10.5v3M12 17v3"/>',
+ globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18"/>',
+ pad:'<path d="M6 8h12a4 4 0 0 1 3.9 4.9l-.8 3.6a2.3 2.3 0 0 1-4 1L15 15H9l-2.1 2.5a2.3 2.3 0 0 1-4-1l-.8-3.6A4 4 0 0 1 6 8z"/><path d="M8 10.5v3M6.5 12h3"/><circle cx="15.5" cy="11" r=".7" fill="currentColor"/><circle cx="17.5" cy="13" r=".7" fill="currentColor"/>',
+ gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M5 12v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-8"/><path d="M12 8C9 8 7 6.8 7 5.3A2.3 2.3 0 0 1 9.3 3C11 3 12 5 12 8zM12 8c3 0 5-1.2 5-2.7A2.3 2.3 0 0 0 14.7 3C13 3 12 5 12 8z"/>',
+ login:'<path d="M15 3h3a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3h-3"/><path d="M10 17l5-5-5-5M15 12H3"/>',
+ menu:'<path d="M4 7h16M4 12h16M4 17h10"/>',
+ chev:'<path d="M15 5l-7 7 7 7"/>'
+};
+const svg=(n,c)=>'<svg class="ic'+(c?' '+c:'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P[n]+'</svg>';
+window.tkIcon=svg;
+function swap(el,name,cls){if(!el||el.dataset.ic)return;el.dataset.ic=name;el.innerHTML=svg(name,cls)}
+function textIcon(el,name){ // replaces the leading emoji text node
+ if(!el||el.dataset.ic)return;const t=[...el.childNodes].find(n=>n.nodeType===3&&n.textContent.trim());
+ if(t)t.textContent=t.textContent.replace(/^[^\u0600-\u06FFA-Za-z0-9]+/,'');el.dataset.ic=name;const s=document.createElement('span');s.className='ic-w';s.innerHTML=svg(name);el.insertBefore(s,el.firstChild)}
+function modern(){
+ const h=document.getElementById('home');if(!h||h.dataset.modern)return;h.dataset.modern='1';
+ const chips=h.querySelectorAll('.hm-chip');
+ if(chips[0]){chips[0].classList.add('c-gem');textIcon(chips[0],'gem')}
+ if(chips[1]){chips[1].classList.add('c-star');textIcon(chips[1],'star')}
+ const lv=h.querySelector('.hm-lvl small');if(lv)textIcon(lv,'medal');
+ const pp=h.querySelector('.primary-play>span:first-child');if(pp){pp.innerHTML=svg('play')}
+ const pl=h.querySelector('.primary-play');if(pl&&!pl.querySelector('.pp-go')){const g=document.createElement('i');g.className='pp-go';g.innerHTML=svg('chev');pl.appendChild(g)}
+ const acts=h.querySelectorAll('.home-actions .btn');
+ [['car','a-car'],['road','a-road'],['globe','a-world']].forEach((x,i)=>{const b=acts[i];if(!b)return;b.classList.add(x[1]);const em=b.querySelector('em');if(em){em.className='ha-ic';em.innerHTML=svg(x[0])}});
+ const nav=h.querySelectorAll('.hm-nav button');
+ ['pad','gift','login','menu'].forEach((n,i)=>{const b=nav[i];if(b)swap(b.querySelector('span'),n)});
+ h.querySelectorAll('.hm-nav span').forEach(s=>s.classList.add('nv-ic'));
+}
+try{modern()}catch(e){}
+document.addEventListener('DOMContentLoaded',()=>{try{modern()}catch(e){}});
+})();
