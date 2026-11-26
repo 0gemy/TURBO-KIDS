@@ -43,3 +43,4 @@
 .bx-card{background:linear-gradient(160deg,var(--k1,#94a3b8),var(--k2,#475569))!important;border-color:#fff!important;color:#fff!important;box-shadow:0 4px 0 #0003}.bx-card b{color:#fff}.bx-card small{color:#fff!important}.bx-card .bx-i{filter:drop-shadow(0 3px 4px #0005)}
 .bx-burst{font-size:64px;animation:bxb .7s ease-out}@keyframes bxb{from{transform:scale(.2) rotate(-40deg);opacity:0}to{transform:none;opacity:1}}
 @media(max-height:620px){#home.on{gap:8px}#home .primary-play{min-height:76px}.home-actions .btn{min-height:70px}}
+.cn{margin-top:6px;font:700 13px Cairo;color:#fde68a;display:flex;flex-direction:column;gap:6px;align-items:center}.cn .btn{width:100%}
