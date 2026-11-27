@@ -55,7 +55,9 @@
 .g4-opt.on{border-color:#16a34a;box-shadow:0 0 0 1px #16a34a inset}
 #garage{position:relative}
 
-#garage{position:fixed;inset:0;height:100%;width:100%;overflow:hidden;display:block}
+#garage{position:fixed;inset:0;height:100%;width:100%;overflow:hidden}
+#garage.on{display:block}
+#garage:not(.on){display:none!important}
 .g4-tier .g4-ic{width:20px;height:20px;display:flex;align-items:center;justify-content:center;margin-bottom:1px}
 .g4-tier .g4-ic svg{width:20px;height:20px;display:block}
 .g4-tier.on .g4-ic{color:#22d3ee}
