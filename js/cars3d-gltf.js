@@ -95,7 +95,11 @@
       var mats = Array.isArray(o.material) ? o.material : [o.material];
       if (/wheel|tire|tyre/.test(nm)) holder.userData.wheels.push(o);
       else if (/glass|window|windshield/.test(nm)) { mats.forEach(function (m) { m.transparent = true; m.opacity = .55; }); }
-      else holder.userData.bodyMats.push(mats[0]);
+      else mats.forEach(function (m) {
+        var mn = (m.name || '').toLowerCase();
+        if (/window|glass|black|grey|gray|light|lamp|tyre|tire|wheel|rubber|chrome|metal|plate/.test(mn)) return;
+        holder.userData.bodyMats.push(m);
+      });
     });
     return holder;
   }

@@ -20,7 +20,7 @@
     { id: 'roof', n: 'سقف', e: '🧰' },
     { id: 'front', n: 'أمامي', e: '🛡️' }
   ];
-  var R3 = null, SC = null, CAM = null, MDL = null, raf = 0, pv = 0, spin = 0, drag = false, lx = 0, moved = 0, tier = 'b', view = 'cars';
+  var R3 = null, SC = null, CAM = null, MDL = null, raf = 0, pv = 0, spin = 0, vel = 0, drag = false, lx = 0, moved = 0, tier = 'b', view = 'cars';
   var THR = null, TSC = null, TCAM = null, cache = {};
 
   function money(n) { return '💎 ' + n; }
@@ -73,7 +73,7 @@
     raf = requestAnimationFrame(loop);
     if (!document.getElementById('garage').classList.contains('on')) { raf = 0; return; }
     resize();
-    if (!drag) spin += .005;
+    if (!drag) { if (Math.abs(vel) > .0009) { spin += vel; vel *= .94; } else { vel = 0; spin += .005; } }
     if (MDL) { MDL.rotation.y = spin; (MDL.userData.wheels || []).forEach(function (w) { w.rotation.x -= .03; }); }
     R3.render(SC, CAM);
   }
@@ -234,10 +234,11 @@
     fill();
     var cv = document.getElementById('g4cv');
     if (cv) {
-      cv.onpointerdown = function (e) { drag = true; lx = e.clientX; moved = 0; };
-      cv.onpointermove = function (e) { if (!drag) return; var d = e.clientX - lx; lx = e.clientX; moved += d; spin += d * .012; };
-      cv.onpointerup = function () { if (drag && Math.abs(moved) > 70) pick(pv + (moved > 0 ? -1 : 1)); drag = false; moved = 0; };
-      cv.onpointercancel = function () { drag = false; moved = 0; };
+      cv.style.touchAction = 'none';
+      cv.onpointerdown = function (e) { drag = true; lx = e.clientX; vel = 0; try { cv.setPointerCapture(e.pointerId); } catch (x) {} };
+      cv.onpointermove = function (e) { if (!drag) return; var d = e.clientX - lx; lx = e.clientX; var dy = d * .011; spin += dy; vel = vel * .5 + dy * .5; };
+      cv.onpointerup = function (e) { drag = false; try { cv.releasePointerCapture(e.pointerId); } catch (x) {} };
+      cv.onpointercancel = function () { drag = false; };
     }
     if (!raf) raf = requestAnimationFrame(loop);
   };
