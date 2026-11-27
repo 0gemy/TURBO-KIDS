@@ -31,7 +31,7 @@ function qsAr(l){const out=[];if(l.wd!=null){for(let k=0;k<5;k++){const i=l.wd,t
 const def=()=>({v:1,coins:0,stars:{},claimed:{},cars:[0],car:0,color:COLS[0],st:{},ach:{},races:0,volume:.75,name:'',avatar:'🦊',avatarImage:'',set:{L:1,S:1,M:0}});
 let S;try{S=Object.assign(def(),JSON.parse(localStorage.getItem('tk1')||'{}'));if(S.v!=1||typeof S.coins!='number'||S.coins<0)S=def()}catch(e){S=def()}
 // Keep older saved garages compatible with the 12-car local catalogue.
-S.cars=(Array.isArray(S.cars)?S.cars:[]).filter(i=>Number.isInteger(i)&&i>=0&&i<CARS.length);if(!S.cars.includes(0))S.cars.unshift(0);if(!Number.isInteger(S.car)||S.car<0||S.car>=CARS.length||!S.cars.includes(S.car))S.car=0;
+S.cars=(Array.isArray(S.cars)?S.cars:[]).filter(i=>Number.isInteger(i)&&i>=0&&i<64);if(!S.cars.includes(0))S.cars.unshift(0);if(!Number.isInteger(S.car)||S.car<0||S.car>=64||!S.cars.includes(S.car))S.car=S.cars[0]||0;
 function svLocal(){try{localStorage.setItem('tk1',JSON.stringify(S))}catch(e){}}function sv(){svLocal();if(typeof syncSoon==='function')syncSoon()}
 const $=i=>document.getElementById(i);
 const tot=()=>Object.values(S.stars).reduce((a,b)=>a+b,0);
@@ -516,7 +516,7 @@ W.forEach((w,wi)=>{if((w.lang||'ar')!==tab)return;h+='<h2>'+w.n+'</h2><div class
 $('lvs').innerHTML=h;$('lvs').onclick=ev=>{const b=ev.target.closest('[data-m],[data-d]');if(!b)return;if(b.dataset.d)S.diff=b.dataset.d;else S.mapTab=b.dataset.m;sv();rmap()}}
 
 // ===== finishes + paint colors =====
-const FINS=[['g','✨ لامع'],['m','🎨 مطفي'],['x','🔩 معدني'],['p','🤍 لؤلؤي'],['n','💡 نيون']],PCOLS=['#ef4444','#f97316','#facc15','#4ade80','#22c55e','#14b8a6','#38bdf8','#3b82f6','#6366f1','#a78bfa','#ec4899','#f43f5e','#92400e','#111827','#9ca3af','#ffffff','#fde68a','#7dd3fc'];
+const FINS=[['g','✨ لامع'],['s','🎨 ساتان'],['m','🎨 مطفي'],['x','🔩 معدني'],['p','🤍 لؤلؤي']],PCOLS=['#ef4444','#f97316','#facc15','#4ade80','#22c55e','#14b8a6','#38bdf8','#3b82f6','#6366f1','#a78bfa','#ec4899','#f43f5e','#92400e','#111827','#9ca3af','#ffffff','#fde68a','#7dd3fc'];
 function bodyMat(color){const f=S.fin||'g',o={color:color,metalness:.25,roughness:.3,clearcoat:1,clearcoatRoughness:.08};
 if(f==='m'){o.metalness=0;o.roughness=.9;o.clearcoat=0}else if(f==='x'){o.metalness=.6;o.roughness=.28;o.clearcoat=.8;o.emissive=new THREE.Color(color);o.emissiveIntensity=.14}else if(f==='p'){o.metalness=.1;o.roughness=.12;o.emissive=new THREE.Color(0xffffff);o.emissiveIntensity=.18}else if(f==='n'){o.roughness=.4;o.clearcoat=0;o.emissive=new THREE.Color(color);o.emissiveIntensity=.6}
 return new THREE.MeshPhysicalMaterial(o)}

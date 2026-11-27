@@ -35,20 +35,30 @@
     { n: 'أوريون كوب',    p: 3000, t: 'c', f: 'q/Cop',           w: 1.92, l: 4.3, cls: 'كوبي' }
   ];
 
+  /* prices brought down to what a kid actually earns in a couple of levels */
   var ADDONS = [
-    { id: 'sp_a', slot: 'spoiler', n: 'سبويلر كلاسيك', p: 300, f: 'debris-spoiler-a' },
-    { id: 'sp_b', slot: 'spoiler', n: 'سبويلر جناح',   p: 450, f: 'debris-spoiler-b' },
-    { id: 'pl_a', slot: 'roof',    n: 'لوح سقف',       p: 200, f: 'debris-plate-a' },
-    { id: 'pl_b', slot: 'roof',    n: 'لوح سقف كبير',  p: 320, f: 'debris-plate-b' },
-    { id: 'bm_a', slot: 'front',   n: 'بامبر أمامي',   p: 260, f: 'debris-bumper' },
-    { id: 'hl_w', slot: 'head', n: 'LED أبيض', p: 350, light: { e: 0xffffff, lens: 0xdfefff }, c: '#ffffff', g: '#eaf6ff' },
-    { id: 'hl_h', slot: 'head', n: 'هالوجين', p: 300, light: { e: 0xffd79a, lens: 0xfff1d0 }, c: '#ffe0b0', g: '#ffd79a' },
-    { id: 'hl_x', slot: 'head', n: 'زينون', p: 450, light: { e: 0xcfe6ff, lens: 0xe9f4ff }, c: '#cfe6ff', g: '#a8d8ff' },
-    { id: 'tl_r', slot: 'tail', n: 'أحمر', p: 320, light: { e: 0xff2b2b, lens: 0xd81b26 }, c: '#ff3b3b', g: '#ff3b3b' },
-    { id: 'tl_s', slot: 'tail', n: 'مدخّن', p: 420, light: { e: 0xff3a3a, lens: 0x3a1418 }, c: '#7f2530', g: '#a8323a' },
-    { id: 'tl_a', slot: 'tail', n: 'كهرماني', p: 380, light: { e: 0xffa21a, lens: 0xd97706 }, c: '#ffa21a', g: '#ffa21a' }
+    { id: 'sp_a', slot: 'spoiler', n: 'سبويلر كلاسيك', p: 160, f: 'debris-spoiler-a' },
+    { id: 'sp_b', slot: 'spoiler', n: 'سبويلر جناح',   p: 240, f: 'debris-spoiler-b' },
+    { id: 'pl_a', slot: 'roof',    n: 'لوح سقف',       p: 120, f: 'debris-plate-a' },
+    { id: 'pl_b', slot: 'roof',    n: 'لوح سقف كبير',  p: 180, f: 'debris-plate-b' },
+    { id: 'bm_a', slot: 'front',   n: 'بامبر أمامي',   p: 150, f: 'debris-bumper' },
+    { id: 'hl_w', slot: 'head', n: 'LED أبيض', p: 180, light: { e: 0xffffff, lens: 0xdfefff }, c: '#ffffff', g: '#eaf6ff' },
+    { id: 'hl_h', slot: 'head', n: 'هالوجين', p: 150, light: { e: 0xffd79a, lens: 0xfff1d0 }, c: '#ffe0b0', g: '#ffd79a' },
+    { id: 'hl_x', slot: 'head', n: 'زينون', p: 220, light: { e: 0xcfe6ff, lens: 0xe9f4ff }, c: '#cfe6ff', g: '#a8d8ff' },
+    { id: 'tl_r', slot: 'tail', n: 'أحمر', p: 170, light: { e: 0xff2b2b, lens: 0xd81b26 }, c: '#ff3b3b', g: '#ff3b3b' },
+    { id: 'tl_s', slot: 'tail', n: 'مدخّن', p: 200, light: { e: 0xff3a3a, lens: 0x3a1418 }, c: '#7f2530', g: '#a8323a' },
+    { id: 'tl_a', slot: 'tail', n: 'كهرماني', p: 190, light: { e: 0xffa21a, lens: 0xd97706 }, c: '#ffa21a', g: '#ffa21a' },
+    { id: 'dc_num',  slot: 'deco', n: 'رقم ٧',  p: 100, d: 'num',  e: 'pearl' },
+    { id: 'dc_eg',   slot: 'deco', n: 'علم مصر', p: 120, d: 'eg',  e: 'flag' },
+    { id: 'dc_star', slot: 'deco', n: 'نجمة',   p: 100, d: 'star', e: 'spark' },
+    { id: 'dc_str',  slot: 'deco', n: 'خطوط سباق', p: 140, d: 'stripe', e: 'bolt' },
+    { id: 'dc_turbo', slot: 'deco', n: 'شعار تيربو', p: 130, d: 'turbo', e: 'crown' }
   ];
   window.TKADDONS = ADDONS;
+  window.TKSETS = [
+    { id: 'set_sport', n: 'طقم رياضي', d: 'أنوار LED + فوانيس حمرا + سبويلر', items: ['hl_w', 'tl_r', 'sp_b'], p: 460 },
+    { id: 'set_classic', n: 'طقم كلاسيك', d: 'هالوجين + كهرماني + سبويلر كلاسيك', items: ['hl_h', 'tl_a', 'sp_a'], p: 420 }
+  ];
 
   var cache = {}, pend = {};
   function load(dir, file, cb) {
@@ -63,22 +73,42 @@
     }, undefined, function () { pend[key] = null; });
   }
 
-  function cloneMats(root) {
+  /* calm the baked toy textures: less saturated, a touch lighter (problem 7) */
+  function calmTex(tex) {
+    try {
+      if (!tex || !tex.image || tex.__calm) return tex;
+      var img = tex.image, c = document.createElement('canvas');
+      c.width = img.width || 256; c.height = img.height || 256;
+      var g = c.getContext('2d');
+      try { g.filter = 'saturate(.55) brightness(1.05)'; } catch (e) {}
+      g.drawImage(img, 0, 0, c.width, c.height);
+      var t2 = new T.CanvasTexture(c);
+      t2.flipY = tex.flipY; t2.wrapS = tex.wrapS; t2.wrapT = tex.wrapT;
+      t2.encoding = T.sRGBEncoding; t2.needsUpdate = true; t2.__calm = 1;
+      return t2;
+    } catch (e) { return tex; }
+  }
+
+  function cloneMats(root, tex) {
     root.traverse(function (o) {
       if (!o.isMesh) return;
       var arr = Array.isArray(o.material) ? o.material : [o.material];
       o.material = Array.isArray(o.material) ? arr.map(function (m) { return m.clone(); }) : arr[0].clone();
       o.castShadow = true;
       (Array.isArray(o.material) ? o.material : [o.material]).forEach(function (m) {
-        if (m.map) m.map.encoding = T.sRGBEncoding;
+        if (m.map) { m.map.encoding = T.sRGBEncoding; if (tex) m.map = calmTex(m.map); }
         m.metalness = .3; m.roughness = .5;
       });
+      /* softer shading on the chunky toy cars */
+      if (tex && o.geometry && o.geometry.attributes && o.geometry.attributes.position) {
+        try { o.geometry = o.geometry.clone(); o.geometry.computeVertexNormals(); } catch (e) {}
+      }
     });
   }
 
   function prep(src, cfg) {
     var root = src.clone(true);
-    cloneMats(root);
+    cloneMats(root, cfg.tex);
     root.updateMatrixWorld(true);
     var bb = new T.Box3().setFromObject(root), sz = bb.getSize(new T.Vector3());
     var s = cfg.l / sz.z;
@@ -116,11 +146,21 @@
     return 0xffffff;
   }
 
+  function finCode() { try { return (typeof S !== 'undefined' && S && S.fin) || 'g'; } catch (e) { return 'g'; } }
+
   function tint(holder, color) {
-    var hex = toHex(color);
+    var hex = toHex(color), f = finCode();
     holder.userData.bodyMats.forEach(function (m) {
       if (!m || !m.color || m.map) return;
       m.color.setHex(hex);
+      if (m.metalness == null) return;
+      if (f === 'm') { m.metalness = .05; m.roughness = .86; }
+      else if (f === 's') { m.metalness = .12; m.roughness = .48; }
+      else if (f === 'x') { m.metalness = .9; m.roughness = .18; }
+      else if (f === 'p') { m.metalness = .2; m.roughness = .10; }
+      else { m.metalness = .3; m.roughness = .28; }
+      if ('clearcoat' in m) { m.clearcoat = (f === 'm' || f === 's') ? .15 : 1; m.clearcoatRoughness = (f === 'm') ? .5 : .08; }
+      m.needsUpdate = true;
     });
   }
 
@@ -217,9 +257,9 @@ function glowTex(){if(GT)return GT;var c=document.createElement("canvas");c.widt
 function addGlow(m,slot,fz,F,def){
  var col=new T.Color(def.e),head=slot==="head",ls=head?F.hw*.55:F.hw*.45;
  [-1,1].forEach(function(sx){
-  var sp=new T.Sprite(new T.SpriteMaterial({map:glowTex(),color:col,transparent:true,opacity:head?.5:.55,blending:T.AdditiveBlending,depthWrite:false}));
+  var sp=new T.Sprite(new T.SpriteMaterial({map:glowTex(),color:col,transparent:true,opacity:head?.34:.4,blending:T.AdditiveBlending,depthWrite:false}));
   sp.scale.set(ls,ls*.7,1);sp.position.set(sx*F.x,F.y,F.z+fz*.1);sp.userData.ex=1;m.add(sp);
-  var pl=new T.Mesh(new T.PlaneGeometry(1,1),new T.MeshBasicMaterial({map:glowTex(),color:col,transparent:true,opacity:head?.26:.2,blending:T.AdditiveBlending,depthWrite:false}));
+  var pl=new T.Mesh(new T.PlaneGeometry(1,1),new T.MeshBasicMaterial({map:glowTex(),color:col,transparent:true,opacity:head?.16:.13,blending:T.AdditiveBlending,depthWrite:false}));
   pl.rotation.x=-Math.PI/2;var len=head?F.hw*1.9:F.hw*1.0;pl.scale.set(F.hw*(head?.95:.7),len,1);pl.position.set(sx*F.x,.04,F.z+fz*len*.42);pl.userData.ex=1;m.add(pl);
  });
 }
@@ -235,7 +275,7 @@ function addGlow(m,slot,fz,F,def){
       [-1, 1].forEach(function (sx) {
         var c = src.clone(true);
         var b0 = new T.Box3().setFromObject(c), s0 = b0.getSize(new T.Vector3());
-        var kk = tc ? 1.6 : 1.5;
+        var kk = tc ? 1.0 : .95;
         var s = Math.min((F.edge - F.x) * 1.7 * kk / Math.max(.001, s0.x), F.hw * (slot === 'head' ? .40 : .34) * kk / Math.max(.001, s0.x), F.H * (slot === 'head' ? .17 : .15) * kk / Math.max(.001, s0.y));
         c.scale.set(sx * s, s, s);
         c.rotation.y = tc ? 0 : Math.PI;
@@ -248,7 +288,61 @@ function addGlow(m,slot,fz,F,def){
     });
   }
 
+  var DTEX = {};
+  function decalTex(kind) {
+    if (DTEX[kind]) return DTEX[kind];
+    var c = document.createElement('canvas'); c.width = c.height = 256;
+    var g = c.getContext('2d');
+    g.clearRect(0, 0, 256, 256);
+    if (kind === 'num') {
+      g.fillStyle = '#f2f4f6'; g.beginPath(); g.arc(128, 128, 104, 0, 7); g.fill();
+      g.strokeStyle = '#1b1e23'; g.lineWidth = 12; g.stroke();
+      g.fillStyle = '#1b1e23'; g.font = 'bold 150px Cairo,system-ui,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText('7', 128, 138);
+    } else if (kind === 'eg') {
+      g.fillStyle = '#ce1126'; g.fillRect(20, 70, 216, 38);
+      g.fillStyle = '#ffffff'; g.fillRect(20, 108, 216, 38);
+      g.fillStyle = '#111111'; g.fillRect(20, 146, 216, 38);
+    } else if (kind === 'star') {
+      g.fillStyle = '#f2a01f'; g.beginPath();
+      for (var i = 0; i < 10; i++) {
+        var r = i % 2 ? 46 : 108, a = -Math.PI / 2 + i * Math.PI / 5;
+        var x = 128 + Math.cos(a) * r, y = 128 + Math.sin(a) * r;
+        i ? g.lineTo(x, y) : g.moveTo(x, y);
+      }
+      g.closePath(); g.fill();
+    } else if (kind === 'stripe') {
+      g.fillStyle = '#1b1e23'; g.fillRect(0, 0, 256, 256);
+    } else if (kind === 'turbo') {
+      g.fillStyle = '#f2a01f'; g.font = 'bold 64px Cairo,system-ui,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText('TURBO', 128, 128);
+    }
+    var t = new T.CanvasTexture(c); t.anisotropy = 4; t.encoding = T.sRGBEncoding;
+    DTEX[kind] = t; return t;
+  }
+
+  function placeDecals(group, cfg, a) {
+    var W = cfg.w || 1.8, L = cfg.l || 4, H = cfg.h || 1.1, kind = a.d || 'star';
+    var mat = new T.MeshBasicMaterial({ map: decalTex(kind), transparent: true, depthWrite: false, side: T.DoubleSide });
+    function top(w, h, x, z) {
+      var m = new T.Mesh(new T.PlaneGeometry(w, h), mat);
+      m.position.set(x, H * 1.012, z); m.rotation.x = -Math.PI / 2; m.userData.ex = 1; group.add(m);
+    }
+    function side(w, h, sx) {
+      var m = new T.Mesh(new T.PlaneGeometry(w, h), mat);
+      m.position.set(sx * (W * .5 + .008), H * .52, 0); m.rotation.y = sx * Math.PI / 2; m.userData.ex = 1; group.add(m);
+    }
+    if (kind === 'stripe') {
+      [-.085, .085].forEach(function (dx) { top(W * .12, L * .62, dx * W, 0); });
+      return;
+    }
+    top(W * .34, W * .34, 0, 0);
+    if (kind !== 'turbo') { side(W * .34, W * .34, 1); side(W * .34, W * .34, -1); }
+  }
+
   function placeAddons(group, cfg) {
+    var deco = partOf('deco');
+    if (deco) placeDecals(group, cfg, deco);
     ['head', 'tail'].forEach(function (slot) {
       var a = partOf(slot); if (!a || !a.light) return;
       placeLights(group, cfg, a);
