@@ -95,7 +95,8 @@
     var b = new T.Box3();
     model.children.forEach(function (c) { if (!c.userData.ex) b.expandByObject(c); });
     var sz = b.getSize(new T.Vector3()), ctr = b.getCenter(new T.Vector3());
-    var dist = (sz.length() / 2) / Math.sin(cam.fov * Math.PI / 360) / Math.min(1, asp) * .70;
+    var fv = cam.fov * Math.PI / 180, r = sz.length() / 2;
+    var dist = Math.max(r / Math.tan(fv / 2), r / (Math.tan(fv / 2) * asp)) * .78;
     cam.aspect = asp; cam.updateProjectionMatrix();
     cam.position.copy(ctr).add(dir.clone().normalize().multiplyScalar(dist));
     cam.lookAt(ctr.x, ctr.y + .04, ctr.z);
