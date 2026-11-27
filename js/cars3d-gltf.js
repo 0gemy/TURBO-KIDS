@@ -106,6 +106,9 @@
     });
   }
 
+  /* families whose models face +z natively and need the half-turn */
+  function flipped(cfg) { return cfg.t !== 'b'; }
+
   function prep(src, cfg) {
     var root = src.clone(true);
     cloneMats(root, cfg.tex);
@@ -116,7 +119,10 @@
     root.scale.setScalar(s);
     root.position.set(-(bb.min.x + sz.x / 2) * s, -bb.min.y * s, -(bb.min.z + sz.z / 2) * s);
     holder.add(root);
-    holder.rotation.y = cfg.t === 'c' ? Math.PI : 0; /* front must face -z: the race camera sits behind the car at +z (Quaternius models face +z natively, Kenney -z) */
+    /* front must face -z: the race camera sits behind the car at +z.
+       Kenney Toy Kit ('b') faces -z natively; Kenney Car Kit ('a') and Quaternius ('c') face +z. */
+    holder.rotation.y = cfg.t === 'b' ? 0 : Math.PI;
+    holder.userData.faceY = holder.rotation.y; /* whoever turns the car must keep this correction */
     holder.userData.wheels = [];
     holder.userData.bodyMats = [];
     root.traverse(function (o) {
@@ -269,7 +275,7 @@ function addGlow(m,slot,fz,F,def){
     var def = { e: L.e, lens: L.lens };
     load('lights', slot === 'head' ? 'headlight' : 'taillight', function (src) {
       if (!group.parent && !group.userData) return;
-      var tc = cfg.t === 'c', fz = (slot === 'head' ? -1 : 1) * (tc ? -1 : 1);
+      var tc = cfg.t === 'c', fl = flipped(cfg), fz = (slot === 'head' ? -1 : 1) * (fl ? -1 : 1);
       var F = fitLamp(group, slot, fz, tc ? (slot === 'head' ? .38 : .46) : (slot === 'head' ? (cfg.t === 'a' ? .40 : .47) : .50), !tc);
       window.__F = window.__F || {}; window.__F[slot] = F;
       [-1, 1].forEach(function (sx) {
@@ -278,7 +284,7 @@ function addGlow(m,slot,fz,F,def){
         var kk = tc ? 1.0 : .95;
         var s = Math.min((F.edge - F.x) * 1.7 * kk / Math.max(.001, s0.x), F.hw * (slot === 'head' ? .40 : .34) * kk / Math.max(.001, s0.x), F.H * (slot === 'head' ? .17 : .15) * kk / Math.max(.001, s0.y));
         c.scale.set(sx * s, s, s);
-        c.rotation.y = tc ? 0 : Math.PI;
+        c.rotation.y = fl ? 0 : Math.PI;
         var b1 = new T.Box3().setFromObject(c), dz = (b1.max.z - b1.min.z);
         var pz = F.z - fz * dz * (tc ? .30 : .12);
         c.position.set(sx * F.x - (b1.min.x + b1.max.x) / 2, F.y - (b1.min.y + b1.max.y) / 2, pz - (b1.min.z + b1.max.z) / 2);
@@ -357,7 +363,7 @@ function addGlow(m,slot,fz,F,def){
         var s = target / Math.max(.01, sz.x);
         m.scale.setScalar(s);
         var y, z;
-        var fl = cfg.t === 'c' ? -1 : 1;
+        var fl = flipped(cfg) ? -1 : 1;
         if (slot === 'spoiler') { y = H * .70; z = LEN * .30 * fl; }
         else if (slot === 'roof') { y = H * .97; z = 0; }
         else { y = H * .18; z = -LEN * .45 * fl; }

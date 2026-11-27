@@ -225,7 +225,7 @@ function snap(spec){
 // ---- scene setups ----
 const lookGame=()=>{cam.position.set(0,4.4,7);cam.lookAt(0,1.35,-4)};
 function gameBase(){
- carObj.position.set(0,0,0);carObj.rotation.y=0;
+ carObj.position.set(0,0,0);carObj.rotation.y=carObj.userData.faceY||0;
  if(skyG){skyG.visible=true;skyG.position.z=0}
  if(shadowM){shadowM.visible=true;shadowM.position.set(0,.035,0);const M=carObj.userData.m;if(M)shadowM.scale.set(M.W*.58,M.L*.56,1)}
  if(plat)plat.visible=false;

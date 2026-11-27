@@ -150,7 +150,7 @@
       if (OUT) { OUT.position.x = -6 * twd * e; OUT.rotation.y += .05; }
       if (tw >= 1) { if (OUT) { SC.remove(OUT); dispose(OUT); OUT = null; } sweep(); }
     }
-    if (MDL) { MDL.rotation.y = spin + Math.PI; (MDL.userData.wheels || []).forEach(function (w) { w.rotation.x -= .03; }); }
+    if (MDL) { MDL.rotation.y = spin + (MDL.userData.faceY || 0); (MDL.userData.wheels || []).forEach(function (w) { w.rotation.x -= .03; }); }
     R3.render(SC, CAM);
   }
 
