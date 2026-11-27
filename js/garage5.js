@@ -15,7 +15,7 @@
     { id: 'roof', n: 'سقف', e: '🧰' },
     { id: 'front', n: 'أمامي', e: '🛡️' }
   ];
-  var PL = null, RG = null, OUT = null, tw = 1, twd = 1, R3 = null, SC = null, CAM = null, MDL = null, raf = 0, pv = 0, spin = 0, vel = 0, drag = false, lx = 0, moved = 0, tier = 'b', view = 'cars';
+  var PRE = {}, cat = 'head', PL = null, RG = null, OUT = null, tw = 1, twd = 1, R3 = null, SC = null, CAM = null, MDL = null, raf = 0, pv = 0, spin = 0, vel = 0, drag = false, lx = 0, moved = 0, tier = 'b', view = 'cars';
   var THR = null, TSC = null, TCAM = null, cache = {};
 
 
@@ -46,6 +46,7 @@
     '<symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6.2 6.1 6.2 10.6a6.2 6.2 0 0 1-12.4 0C5.8 9.1 12 3 12 3z"/></symbol>' +
     '<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13.5 2 5 13.6h5.6L9.4 22l9.2-12.2h-5.7z"/></symbol>' +
     '<symbol id="i-pearl" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2"/><ellipse cx="8.8" cy="8.6" rx="2.6" ry="1.7" fill="#fff" fill-opacity=".75" transform="rotate(-35 8.8 8.6)"/></symbol>' +
+    '<symbol id="i-eye" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 5c-5 0-8.7 4.1-10 7 1.3 2.9 5 7 10 7s8.7-4.1 10-7c-1.3-2.9-5-7-10-7zm0 11.4a4.4 4.4 0 1 1 0-8.8 4.4 4.4 0 0 1 0 8.8zm0-2.3a2.1 2.1 0 1 0 0-4.2 2.1 2.1 0 0 0 0 4.2z"/></symbol>' +
     '<symbol id="i-bulb" viewBox="0 0 24 24"><path d="M12 2.2a6.6 6.6 0 0 0-3.9 11.9c.5.4.8 1 .8 1.6V17h6.2v-1.3c0-.6.3-1.2.8-1.6A6.6 6.6 0 0 0 12 2.2z"/><rect x="9.2" y="18.4" width="5.6" height="3" rx="1.5"/></symbol>' +
     '</defs></svg>';
   var FIC = { g: 'spark', m: 'drop', x: 'bolt', p: 'pearl', n: 'bulb' };
@@ -89,7 +90,9 @@
   }
   function buildModel(i, dir) {
     var m = buildCarGroup(i, S.color);
+    var real = S.addon; S.addon = Object.assign({}, real || {}, PRE);
     try { addExtras(m); } catch (e) {}
+    S.addon = real;
     if (OUT) { SC.remove(OUT); dispose(OUT); OUT = null; }
     if (MDL && dir) { OUT = MDL; } else if (MDL) { SC.remove(MDL); dispose(MDL); }
     m.userData.isCar = 1; MDL = m; SC.add(MDL); sweep();
@@ -156,24 +159,37 @@
     fillAddons();
   }
 
+  function addonById(id) { return (window.TKADDONS || []).filter(function (x) { return x.id === id; })[0]; }
   function fillAddons() {
     var box = document.getElementById('g4addlist'); if (!box) return;
     var own = S.addonsOwned || (S.addonsOwned = []), eq = S.addon || (S.addon = {});
-    box.innerHTML = SLOTS.map(function (s) {
-      var items = (window.TKADDONS || []).filter(function (a) { return a.slot === s.id; });
-      var lamp = (s.id === 'head' || s.id === 'tail'), cls = s.id === 'head' ? 'h' : 't';
-      var cards = '<button class="g4-adc' + (eq[s.id] ? '' : ' on') + '" data-off="' + s.id + '"><i class="g4-lamp none"></i><b>بدون</b><small>مطفي</small></button>';
-      cards += items.map(function (a) {
-        var has = own.indexOf(a.id) >= 0, on = eq[s.id] === a.id;
-        var art = lamp ? '<i class="g4-lamp ' + cls + '" style="--c:' + (a.c || '#9fc4dc') + ';--g:' + (a.g || '#22d3ee') + '"></i>' : '<i class="g4-lamp part">' + ic(SLIC[s.id][0], SLIC[s.id][1]) + '</i>';
-        return '<button class="g4-adc' + (on ? ' on' : '') + (has ? '' : ' buy') + '" data-add="' + a.id + '">' + art + '<b>' + a.n + '</b><small>' + (has ? (on ? 'مركّب' : 'عندك') : money(a.p)) + '</small></button>';
-      }).join('');
-      return '<div class="g4-slot"><div class="g4-sloth"><b>' + s.e + ' ' + s.n + '</b></div><div class="g4-adrow">' + cards + '</div></div>';
+    var s = SLOTS.filter(function (x) { return x.id === cat; })[0] || SLOTS[0];
+    var items = (window.TKADDONS || []).filter(function (a) { return a.slot === s.id; });
+    var lamp = (s.id === 'head' || s.id === 'tail'), cls = s.id === 'head' ? 'h' : 't';
+    var pre = PRE[s.id];
+    var tabs = SLOTS.map(function (x) {
+      var dot = PRE[x.id] ? '<i class="g4-pvdot"></i>' : '';
+      return '<button class="g4-cat' + (x.id === cat ? ' on' : '') + '" data-cat="' + x.id + '">' + ic(SLIC[x.id][0], x.id === cat ? 'go' : 'gw') + '<b>' + x.n + '</b>' + dot + '</button>';
     }).join('');
+    var cards = '<button class="g4-adc' + ((!eq[s.id] && pre === undefined) || pre === '' ? ' pv' : '') + (!eq[s.id] ? ' on' : '') + '" data-off="' + s.id + '"><i class="g4-lamp none"></i><b>بدون</b><small>مطفي</small></button>';
+    cards += items.map(function (a) {
+      var has = own.indexOf(a.id) >= 0, on = eq[s.id] === a.id, pv2 = pre === a.id;
+      var art = lamp ? '<i class="g4-lamp ' + cls + '" style="--c:' + (a.c || '#9fc4dc') + ';--g:' + (a.g || '#22d3ee') + '"></i>' : '<i class="g4-lamp part">' + ic(SLIC[s.id][0], SLIC[s.id][1]) + '</i>';
+      return '<button class="g4-adc' + (on ? ' on' : '') + (pv2 ? ' pv' : '') + (has ? '' : ' buy') + '" data-add="' + a.id + '">' + art + '<b>' + a.n + '</b><small>' + (pv2 ? ic('eye', 'gw') + ' معاينة' : has ? (on ? 'مركّب' : 'عندك') : money(a.p)) + '</small></button>';
+    }).join('');
+    var sel = pre ? addonById(pre) : null;
+    var bar;
+    if (sel && own.indexOf(sel.id) < 0) bar = '<button class="g4-addbuy buy" data-a="buyadd">' + ic('cart', 'gw') + ' اشترِ ' + sel.n + ' ' + ic('gem', 'gw') + ' ' + sel.p + '</button>';
+    else bar = '<div class="g4-addhint">' + ic('eye', 'gw') + ' اضغط على أي إضافة تشوفها على العربية</div>';
+    box.innerHTML = '<div class="g4-cats">' + tabs + '</div><div class="g4-adrow">' + cards + '</div>' + bar;
+    var pp = document.getElementById('g4prev');
+    var any = Object.keys(PRE).filter(function (k) { return PRE[k]; });
+    if (pp) { pp.innerHTML = any.length ? ic('eye', 'gw') + ' معاينة: ' + any.map(function (k) { return addonById(PRE[k]).n; }).join(' + ') : ''; pp.classList.toggle('on', any.length > 0); }
   }
+  function clearPre() { var had = Object.keys(PRE).length; PRE = {}; var pp = document.getElementById('g4prev'); if (pp) { pp.innerHTML = ''; pp.classList.remove('on'); } if (had) buildModel(pv); }
 
   function pick(i, dir) {
-    var old = pv;
+    var old = pv; PRE = {};
     pv = (i + CARS.length) % CARS.length;
     tier = tierOf(pv);
     buildModel(pv, dir || (pv === old ? 0 : (pv > old ? 1 : -1)));
@@ -181,7 +197,9 @@
   }
   function sheet(id) {
     ['g4paintsheet', 'g4addpanel'].forEach(function (x) { var e = document.getElementById(x); if (e) e.classList.toggle('on', x === id); });
-    var sc = document.getElementById('g4scrim'); if (sc) sc.classList.toggle('on', !!id);
+    var sc = document.getElementById('g4scrim'); if (sc) sc.classList.toggle('on', id === 'g4paintsheet');
+    var g = document.querySelector('.g4'); if (g) g.classList.toggle('addon-open', id === 'g4addpanel');
+    if (id !== 'g4addpanel') clearPre(); else fillAddons();
   }
   function warm() {
     var L = carList().concat(CARS.map(function (c, i) { return i; })), k = 0;
@@ -196,7 +214,7 @@
   window.__rgAng = function (a) { spin = a; };
   window.__rgEquip = function (o) { S.addonsOwned = (window.TKADDONS || []).map(function (a) { return a.id; }); S.addon = o || {}; buildModel(pv); fill(); };
   window.__rgPickTier = function (t) { var i = 0; for (var k = 0; k < CARS.length; k++) if (tierOf(k) === t) { i = k; break; } pv = i; tier = t; buildModel(pv); fill(); };
-  window.__rgSheet = sheet;
+  window.__rgSheet = sheet; window.__rgPre = function (id) { var a = addonById(id); PRE[a.slot] = id; cat = a.slot; buildModel(pv); fill(); };
   window.rgar = function () {
     var G = document.getElementById('garage');
     pv = (pv >= 0 && pv < CARS.length) ? pv : (S.car || 0);
@@ -210,14 +228,14 @@
         '<div class="g4-name"><b id="g4nm">—</b><small id="g4cl">—</small></div>' +
         '<button class="g4-nav r" data-n="1" aria-label="السابقة">‹</button>' +
         '<button class="g4-nav l" data-n="-1" aria-label="التالية">›</button>' +
-        '<div class="g4-dots" id="g4dots"></div><div class="g4-badge" id="g4badge"></div></div>' +
+        '<div class="g4-prev" id="g4prev"></div><div class="g4-dots" id="g4dots"></div><div class="g4-badge" id="g4badge"></div></div>' +
         '<div class="g4-bar"><button class="g4-cta" id="g4cta"></button>' +
         '<div class="g4-tools"><button class="g4-tool" id="g4paint" data-a="paint"><span>' + ic('palette', 'gp') + '</span><b>لوّن</b></button>' +
         '<button class="g4-tool" data-a="addons"><span>' + ic('puzzle', 'gc') + '</span><b>إضافات</b></button></div></div>' +
         '<div class="g4-scrim" id="g4scrim" data-a="close"></div>' +
         '<div class="g4-sh" id="g4paintsheet"><div class="g4-addhead"><b>' + ic('palette', 'gp') + ' اختار اللون</b><button class="g4-close" data-a="close">' + ic('check') + ' تمّ</button></div>' +
         '<div class="g4-row" id="g4colors"></div><div class="g4-subt">شكل الطلاء</div><div class="g4-row" id="g4fins"></div></div>' +
-        '<div class="g4-sh tall" id="g4addpanel"><div class="g4-addhead"><b>' + ic('puzzle', 'gc') + ' إضافات العربية</b><button class="g4-close" data-a="close">' + ic('check') + ' تمّ</button></div>' +
+        '<div class="g4-sh add" id="g4addpanel"><div class="g4-addhead"><b>' + ic('puzzle', 'gc') + ' إضافات العربية</b><button class="g4-close" data-a="close">' + ic('check') + ' تمّ</button></div>' +
         '<div class="g4-addlist" id="g4addlist"></div></div>' +
         '</div>';
       R3 = null;
@@ -251,10 +269,18 @@
     setTimeout(warm, 600);
   };
 
+  function buyAddon(a) {
+    if (S.coins < a.p) { cel('تحتاج ' + (a.p - S.coins) + ' عملة إضافية', 1500, 0); return; }
+    fixModal(); askBuy({ n: a.n, p: a.p, ico: ic('puzzle', 'gc') }, function () {
+      S.coins -= a.p; S.addonsOwned.push(a.id); S.addon[a.slot] = a.id; delete PRE[a.slot]; sv();
+      try { beep(800, .15); hud(); } catch (err) {}
+      buildModel(pv); fill();
+    });
+  }
   document.addEventListener('click', function (e) {
     var g = document.getElementById('garage');
     if (!g || !g.classList.contains('on')) return;
-    var t = e.target.closest('[data-c],[data-f],[data-a],[data-n],[data-act],[data-t],[data-add],[data-off]');
+    var t = e.target.closest('[data-c],[data-f],[data-cat],[data-a],[data-n],[data-act],[data-t],[data-add],[data-off]');
     if (!t) return;
     try { ac(); } catch (err) {}
     
@@ -266,21 +292,15 @@
     if (t.dataset.a === 'addons') { sheet('g4addpanel'); return; }
     if (t.dataset.a === 'paint') { sheet('g4paintsheet'); return; }
     if (t.dataset.a === 'close') { sheet(null); return; }
-    if (t.dataset.off) { S.addon[t.dataset.off] = ''; sv(); buildModel(pv); fill(); return; }
+    if (t.dataset.cat) { cat = t.dataset.cat; fillAddons(); return; }
+    if (t.dataset.off) { S.addon[t.dataset.off] = ''; delete PRE[t.dataset.off]; sv(); buildModel(pv); fill(); return; }
+    if (t.dataset.a === 'buyadd') { var pa = addonById(PRE[cat]); if (pa) buyAddon(pa); return; }
     if (t.dataset.add) {
-      var a = (window.TKADDONS || []).filter(function (x) { return x.id === t.dataset.add; })[0];
+      var a = addonById(t.dataset.add);
       if (!a) return;
       S.addonsOwned = S.addonsOwned || [];
-      if (S.addonsOwned.indexOf(a.id) < 0) {
-        if (S.coins < a.p) { cel('تحتاج ' + (a.p - S.coins) + ' عملة إضافية', 1500, 0); return; }
-        fixModal(); askBuy({ n: a.n, p: a.p, ico: ic('puzzle', 'gc') }, function () {
-          S.coins -= a.p; S.addonsOwned.push(a.id); S.addon[a.slot] = a.id; sv();
-          try { beep(800, .15); hud(); } catch (err) {}
-          buildModel(pv); fill();
-        });
-        return;
-      }
-      S.addon[a.slot] = a.id; sv(); buildModel(pv); fill(); return;
+      if (S.addonsOwned.indexOf(a.id) < 0) { PRE[a.slot] = a.id; cat = a.slot; buildModel(pv); fill(); return; }
+      delete PRE[a.slot]; S.addon[a.slot] = a.id; sv(); buildModel(pv); fill(); return;
     }
     var act = t.dataset.act;
     if (act === 'eq') { S.car = pv; sv(); try { applyCar(); } catch (err) {} try { beep(660, .12); } catch (err) {} fill(); return; }
