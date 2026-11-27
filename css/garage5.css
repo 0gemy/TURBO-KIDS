@@ -1,4 +1,12 @@
 /* TURBO KIDS - garage 5.1: calm graphite showroom */
+/* icons: global default size so any .ic svg (including the buy-confirm dialog) stays small */
+.ic{width:1.2em;height:1.2em;display:inline-block;vertical-align:-.22em;flex:none}
+.cf-pv .ic{width:60px;height:60px;vertical-align:0}
+.cf-q .ic,.cf-bal b .ic,.cf-bal span .ic{width:17px;height:17px;vertical-align:-.18em}
+.cf-bal .ic{width:15px;height:15px}
+.btn .ic{width:1.05em;height:1.05em;vertical-align:-.16em}
+.mdl-t .ic{width:1em;height:1em}
+
 #garage{position:fixed;inset:0;height:100%;width:100%;overflow:hidden;padding:0;gap:0}
 #garage.on{display:block}
 #garage:not(.on){display:none!important}
