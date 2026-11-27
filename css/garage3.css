@@ -1,0 +1,41 @@
+/* TURBO KIDS - garage 2.0 (preview build): new showroom-style garage UI */
+.g3{width:100%;max-width:620px;height:100%;display:flex;flex-direction:column;gap:10px;padding:calc(env(safe-area-inset-top) + 8px) 12px calc(env(safe-area-inset-bottom) + 10px);box-sizing:border-box}
+.g3-head{display:flex;align-items:center;gap:10px}
+.g3-head b{font:800 24px Cairo;color:#fff;text-shadow:0 2px 0 #0006;flex:1}
+.g3-back{width:44px;height:44px;border-radius:16px;border:0;background:#ffffff1f;color:#fff;font:800 20px Cairo;display:grid;place-items:center}
+.g3-coins{background:#071b32;border:1px solid #ffffff26;border-radius:999px;padding:7px 14px;font:800 15px Cairo;color:#fff}
+.g3-stage{position:relative;flex:1;min-height:0;border-radius:26px;overflow:hidden;border:1px solid #ffffff22;
+  background:radial-gradient(70% 60% at 50% 32%,#2c6ea6 0%,#15395c 58%,#0a1d33 100%);box-shadow:0 14px 34px #00000055}
+.g3-stage canvas{display:block;width:100%;height:100%}
+.g3-name{position:absolute;top:12px;inset-inline:12px;text-align:center;pointer-events:none}
+.g3-name b{display:block;font:800 22px Cairo;color:#fff;text-shadow:0 2px 8px #0009}
+.g3-name small{font:700 12px Cairo;color:#bae6fd}
+.g3-nav{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:0;
+  background:#0b1f36b3;color:#fff;font:800 22px Cairo;display:grid;place-items:center;backdrop-filter:blur(4px)}
+.g3-nav.r{inset-inline-start:10px}.g3-nav.l{inset-inline-end:10px}
+.g3-badge{position:absolute;bottom:12px;inset-inline-start:12px;display:flex;gap:6px}
+.g3-pill{background:#08192cd9;border:1px solid #ffffff26;border-radius:999px;padding:5px 12px;font:800 12px Cairo;color:#e2e8f0}
+.g3-pill.ok{background:#16a34a;border-color:#16a34a;color:#fff}
+.g3-pill.gold{background:#f59e0b;border-color:#f59e0b;color:#3b2405}
+.g3-sheet{display:flex;flex-direction:column;gap:8px}
+.g3-row{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+.g3-dot{width:34px;height:34px;border-radius:50%;border:3px solid #ffffff33;transition:.15s}
+.g3-dot.sel{border-color:#fff;box-shadow:0 0 0 3px #22d3ee77;transform:scale(1.06)}
+.g3-fin{border:2px solid #ffffff26;background:#0e2644;color:#dbeafe;border-radius:999px;padding:5px 13px;font:700 12px Cairo}
+.g3-fin.sel{border-color:#22d3ee;color:#fff;background:#124a6b}
+.g3-cta{width:100%;min-height:56px;border:0;border-radius:18px;font:800 19px Cairo;color:#fff;
+  background:linear-gradient(180deg,#22c55e,#15803d);box-shadow:0 5px 0 #0b5a2b}
+.g3-cta.buy{background:linear-gradient(180deg,#fbbf24,#d97706);box-shadow:0 5px 0 #92590a;color:#3b2405}
+.g3-cta.off{background:#1e3a5f;box-shadow:0 5px 0 #0e2138;color:#94a3b8}
+.g3-rail{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scroll-snap-type:x proximity}
+.g3-rail::-webkit-scrollbar{display:none}
+.g3-card{flex:none;width:104px;scroll-snap-align:center;border-radius:16px;border:2px solid #ffffff1f;background:#0d2340;
+  padding:4px;display:flex;flex-direction:column;align-items:center;gap:1px;color:#e2e8f0;position:relative}
+.g3-card.on{border-color:#22d3ee;background:#123a5c;box-shadow:0 0 0 3px #22d3ee44}
+.g3-card img{width:100%;height:52px;object-fit:contain;display:block}
+.g3-card b{font:700 10.5px Cairo;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:96px}
+.g3-card small{font:700 10px Cairo;color:#93c5fd}
+.g3-card.lock small{color:#fbbf24}
+.g3-card .lk{position:absolute;top:4px;inset-inline-end:6px;font-size:11px;opacity:.8}
+@media(min-width:760px){.g3{max-width:900px;display:grid;grid-template-columns:1.2fr 1fr;grid-template-rows:auto 1fr auto;gap:12px}
+  .g3-head{grid-column:1/-1}.g3-stage{grid-row:2/4}.g3-rail{grid-column:2}}
