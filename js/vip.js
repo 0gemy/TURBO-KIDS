@@ -10,9 +10,9 @@ function ring(i){if(!pool[i]){const d=document.createElement('div');d.className=
 function vis(el){if(!el.getClientRects().length)return false;const cs=getComputedStyle(el);return cs.display!=='none'&&cs.visibility!=='hidden'}
 function tick(){
  const m=mine();let i=0;
- if(m){const q=document.querySelectorAll('#globalAvatar,#avatarPreview,.greeting-avatar,.greeting-emoji');
+ if(m){const q=document.querySelectorAll('#globalAvatar,#hmAcc,.acc-av,#avatarPreview,.greeting-avatar,.greeting-emoji');
   q.forEach(el=>{if(!vis(el))return;const r=el.getBoundingClientRect();if(r.width<12)return;
-   const d=Math.min(r.width,r.height),s=d/0.62*0.97,cx=r.left+r.width/2,cy=r.top+r.height/2;
+   const d=Math.min(r.width,r.height),cx=r.left+r.width/2,cy=r.top+r.height/2,vw=document.documentElement.clientWidth;let s=d/0.62*0.97;s=Math.min(s,2*cx-4,2*(vw-cx)-4,(cy-2)/0.555);if(s<d)s=d;
    const g=ring(i++);g.style.display='block';g.style.width=g.style.height=s+'px';g.style.transform='translate('+(cx-s/2+s*0.008)+'px,'+(cy-s/2-s*0.055)+'px)'})}
  for(;i<pool.length;i++)pool[i].style.display='none';
  requestAnimationFrame(tick)}
