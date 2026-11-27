@@ -83,12 +83,16 @@
     o.traverse(function (x) { if (x.isMesh) { x.geometry.dispose(); } });
   }
 
+  function sweep() {
+    if (!SC) return;
+    SC.children.slice().forEach(function (c) { if (c.userData && c.userData.isCar && c !== MDL && c !== OUT) { SC.remove(c); dispose(c); } });
+  }
   function buildModel(i, dir) {
     var m = buildCarGroup(i, S.color);
     try { addExtras(m); } catch (e) {}
     if (OUT) { SC.remove(OUT); dispose(OUT); OUT = null; }
     if (MDL && dir) { OUT = MDL; } else if (MDL) { SC.remove(MDL); dispose(MDL); }
-    MDL = m; SC.add(MDL);
+    m.userData.isCar = 1; MDL = m; SC.add(MDL); sweep();
     if (dir) { tw = 0; twd = dir; MDL.position.x = 6 * dir; } else { tw = 1; }
     if (R3) { var cv = document.getElementById('g4cv'); if (cv && cv.clientWidth) fitCam(CAM, MDL, cv.clientWidth / cv.clientHeight, new T.Vector3(-.62, .30, -1)); }
   }
@@ -114,9 +118,9 @@
       tw = Math.min(1, tw + .055); var e = ease(tw);
       if (MDL) MDL.position.x = 6 * twd * (1 - e);
       if (OUT) { OUT.position.x = -6 * twd * e; OUT.rotation.y += .05; }
-      if (tw >= 1 && OUT) { SC.remove(OUT); dispose(OUT); OUT = null; }
+      if (tw >= 1) { if (OUT) { SC.remove(OUT); dispose(OUT); OUT = null; } sweep(); }
     }
-    if (MDL) { MDL.rotation.y = spin; (MDL.userData.wheels || []).forEach(function (w) { w.rotation.x -= .03; }); }
+    if (MDL) { MDL.rotation.y = spin + Math.PI; (MDL.userData.wheels || []).forEach(function (w) { w.rotation.x -= .03; }); }
     R3.render(SC, CAM);
   }
 
@@ -232,7 +236,8 @@
       sh.rotation.x = -Math.PI / 2; sh.position.y = .008; SC.add(sh);
       CAM = new T.PerspectiveCamera(32, 1.5, .1, 100);
     }
-    MDL = null; OUT = null; buildModel(pv); spin = 3.55; sheet(null); window.__rgTheme('b');
+    if (SC) { if (MDL) SC.remove(MDL); if (OUT) SC.remove(OUT); }
+    MDL = null; OUT = null; tw = 1; sweep(); buildModel(pv); spin = 3.55; sheet(null); window.__rgTheme('b');
     fill();
     var cv = document.getElementById('g4cv'), sx = 0, sy = 0;
     if (cv) {

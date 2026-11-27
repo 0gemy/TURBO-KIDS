@@ -86,7 +86,7 @@
     root.scale.setScalar(s);
     root.position.set(-(bb.min.x + sz.x / 2) * s, -bb.min.y * s, -(bb.min.z + sz.z / 2) * s);
     holder.add(root);
-    holder.rotation.y = Math.PI;
+    holder.rotation.y = cfg.t === 'c' ? Math.PI : 0; /* front must face -z: the race camera sits behind the car at +z (Quaternius models face +z natively, Kenney -z) */
     holder.userData.wheels = [];
     holder.userData.bodyMats = [];
     root.traverse(function (o) {
@@ -229,7 +229,7 @@ function addGlow(m,slot,fz,F,def){
     var def = { e: L.e, lens: L.lens };
     load('lights', slot === 'head' ? 'headlight' : 'taillight', function (src) {
       if (!group.parent && !group.userData) return;
-      var fz = slot === 'head' ? 1 : -1, tc = cfg.t === 'c';
+      var fz = slot === 'head' ? -1 : 1, tc = cfg.t === 'c';
       var F = fitLamp(group, slot, fz, tc ? (slot === 'head' ? .38 : .46) : (slot === 'head' ? (cfg.t === 'a' ? .40 : .47) : .50), !tc);
       window.__F = window.__F || {}; window.__F[slot] = F;
       [-1, 1].forEach(function (sx) {
@@ -238,7 +238,7 @@ function addGlow(m,slot,fz,F,def){
         var kk = tc ? 1 : 1.3;
         var s = Math.min((F.edge - F.x) * 1.7 * kk / Math.max(.001, s0.x), F.hw * (slot === 'head' ? .40 : .34) * kk / Math.max(.001, s0.x), F.H * (slot === 'head' ? .17 : .15) * kk / Math.max(.001, s0.y));
         c.scale.set(sx * s, s, s);
-        c.rotation.y = 0;
+        c.rotation.y = Math.PI;
         var b1 = new T.Box3().setFromObject(c), dz = (b1.max.z - b1.min.z);
         var pz = F.z - fz * dz * (tc ? .30 : .12);
         c.position.set(sx * F.x - (b1.min.x + b1.max.x) / 2, F.y - (b1.min.y + b1.max.y) / 2, pz - (b1.min.z + b1.max.z) / 2);
