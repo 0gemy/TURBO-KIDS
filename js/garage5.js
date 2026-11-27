@@ -89,10 +89,9 @@
     SC.children.slice().forEach(function (c) { if (c.userData && c.userData.isCar && c !== MDL && c !== OUT) { SC.remove(c); dispose(c); } });
   }
   function buildModel(i, dir) {
-    var m = buildCarGroup(i, S.color);
     var real = S.addon; S.addon = Object.assign({}, real || {}, PRE);
-    try { addExtras(m); } catch (e) {}
-    S.addon = real;
+    var m;
+    try { m = buildCarGroup(i, S.color); try { addExtras(m); } catch (e) {} } finally { S.addon = real; }
     if (OUT) { SC.remove(OUT); dispose(OUT); OUT = null; }
     if (MDL && dir) { OUT = MDL; } else if (MDL) { SC.remove(MDL); dispose(MDL); }
     m.userData.isCar = 1; MDL = m; SC.add(MDL); sweep();

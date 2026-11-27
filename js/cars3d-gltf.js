@@ -229,16 +229,16 @@ function addGlow(m,slot,fz,F,def){
     var def = { e: L.e, lens: L.lens };
     load('lights', slot === 'head' ? 'headlight' : 'taillight', function (src) {
       if (!group.parent && !group.userData) return;
-      var fz = slot === 'head' ? -1 : 1, tc = cfg.t === 'c';
+      var tc = cfg.t === 'c', fz = (slot === 'head' ? -1 : 1) * (tc ? -1 : 1);
       var F = fitLamp(group, slot, fz, tc ? (slot === 'head' ? .38 : .46) : (slot === 'head' ? (cfg.t === 'a' ? .40 : .47) : .50), !tc);
       window.__F = window.__F || {}; window.__F[slot] = F;
       [-1, 1].forEach(function (sx) {
         var c = src.clone(true);
         var b0 = new T.Box3().setFromObject(c), s0 = b0.getSize(new T.Vector3());
-        var kk = tc ? 1 : 1.3;
+        var kk = tc ? 1.6 : 1.5;
         var s = Math.min((F.edge - F.x) * 1.7 * kk / Math.max(.001, s0.x), F.hw * (slot === 'head' ? .40 : .34) * kk / Math.max(.001, s0.x), F.H * (slot === 'head' ? .17 : .15) * kk / Math.max(.001, s0.y));
         c.scale.set(sx * s, s, s);
-        c.rotation.y = Math.PI;
+        c.rotation.y = tc ? 0 : Math.PI;
         var b1 = new T.Box3().setFromObject(c), dz = (b1.max.z - b1.min.z);
         var pz = F.z - fz * dz * (tc ? .30 : .12);
         c.position.set(sx * F.x - (b1.min.x + b1.max.x) / 2, F.y - (b1.min.y + b1.max.y) / 2, pz - (b1.min.z + b1.max.z) / 2);
@@ -263,9 +263,11 @@ function addGlow(m,slot,fz,F,def){
         var s = target / Math.max(.01, sz.x);
         m.scale.setScalar(s);
         var y, z;
-        if (slot === 'spoiler') { y = H * .70; z = LEN * .30; }
+        var fl = cfg.t === 'c' ? -1 : 1;
+        if (slot === 'spoiler') { y = H * .70; z = LEN * .30 * fl; }
         else if (slot === 'roof') { y = H * .97; z = 0; }
-        else { y = H * .18; z = -LEN * .45; }
+        else { y = H * .18; z = -LEN * .45 * fl; }
+        if (fl < 0) m.rotation.y = Math.PI;
         m.position.set(0, y, z);
         m.userData.ex = 1;
         group.add(m);
