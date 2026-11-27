@@ -314,7 +314,7 @@
   window.__rgPre = function (id) { var a = addonById(id); if (!a) return; PRE[a.slot] = id; cat = a.slot; buildModel(pv); fill(); faceSlot(a.slot); };
 
   var HTML =
-    '<div class="g4" data-th="b">' + SYM +
+    '<div class="g4" data-th="b">' +
     '<div class="g4-head"><button class="g4-back" data-a="back" aria-label="رجوع">' + ic('back') + '</button>' +
     '<b>' + ic('home', 'go') + ' الكراج</b>' +
     '<button class="g4-help" data-a="help" aria-label="شرح">؟</button>' +
@@ -339,7 +339,17 @@
     '<button class="g4-iyes" data-a="introok">يلا نشوف</button></div></div>' +
     '</div>';
 
+  function defs() {
+    if (document.getElementById('g4defs')) return;
+    var d = document.createElement('div');
+    d.id = 'g4defs';
+    d.setAttribute('aria-hidden', 'true');
+    d.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+    d.innerHTML = SYM;
+    document.body.appendChild(d);
+  }
   window.rgar = function () {
+    defs();
     var G = document.getElementById('garage');
     pv = (S.car >= 0 && S.car < CARS.length) ? S.car : 0; tier = tierOf(pv);
     if (!document.getElementById('g4cv')) { G.innerHTML = HTML; R3 = null; }
