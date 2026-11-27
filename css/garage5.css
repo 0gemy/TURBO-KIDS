@@ -198,3 +198,28 @@ body:has(#garage.on) .global-home-back{display:none!important}
 .g4[data-th=b] .g4-lamp.h{box-shadow:0 0 5px 0 var(--g)}.g4[data-th=b] .g4-lamp.t{box-shadow:0 0 5px 0 var(--g)}
 .g4[data-th=b] .g4-scrim.on{background:#000a}
 .g4[data-th=b] .ic{filter:none}
+
+/* ---------- add-ons try-on: compact panel, car stays visible ---------- */
+.g4-stage{transition:bottom .3s cubic-bezier(.2,.8,.2,1)}
+.g4.addon-open .g4-stage{bottom:318px}
+.g4.addon-open .g4-dots,.g4.addon-open .g4-badge{display:none}
+.g4-sh.add{max-height:none;height:auto;padding-top:10px}
+.g4-sh.add .g4-addhead{padding-bottom:8px}
+.g4-sh.add .g4-addhead b{font-size:20px}
+.g4-cats{display:flex;gap:6px;overflow-x:auto;padding:0 0 8px}.g4-cats::-webkit-scrollbar{display:none}
+.g4-cat{flex:1 0 64px;position:relative;height:58px;border-radius:14px;background:#ffffff12;color:#c5ccd6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:700}
+.g4-cat b{font-size:11px;font-weight:700}.g4-cat .ic{width:22px;height:22px}
+.g4-cat.on{background:#f2a01f26;box-shadow:inset 0 0 0 2px #f2a01f;color:#fff}
+.g4-pvdot{position:absolute;top:6px;right:8px;width:8px;height:8px;border-radius:50%;background:#fff}
+.g4-sh.add .g4-adrow{padding:2px 0 8px}
+.g4-sh.add .g4-adc{flex:0 0 92px;padding:8px 4px 6px}
+.g4-adc.pv{border-color:#fff!important;background:#ffffff1f}
+.g4-adc small .ic{width:13px;height:13px}
+.g4-addbuy{width:100%;height:56px;border-radius:18px;background:#f2a01f;color:#1d1405;font-size:19px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px}
+.g4-addbuy .ic{width:24px;height:24px;filter:none}
+.g4-addhint{height:56px;display:flex;align-items:center;justify-content:center;gap:8px;color:#aeb6c2;font-size:15px;font-weight:700}
+.g4-addhint .ic{width:20px;height:20px}
+.g4-prev{position:absolute;left:50%;bottom:8px;transform:translate(-50%,10px);opacity:0;pointer-events:none;padding:7px 16px;border-radius:16px;background:#000a;color:#fff;font-size:15px;font-weight:800;display:flex;align-items:center;gap:7px;white-space:nowrap;transition:all .25s;z-index:2}
+.g4-prev .ic{width:20px;height:20px}
+.g4-prev.on{opacity:1;transform:translate(-50%,0)}
+.g4-addlist{overflow:visible}
